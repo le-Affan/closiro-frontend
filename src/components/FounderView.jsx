@@ -3,7 +3,7 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
   XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList,
 } from 'recharts';
-import { Card, CardHeader, DownArrow, DotsIcon, Sparkle, PerformersTable, PipelineFunnel, DraggableCard, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
+import { Card, CardHeader, ConnectedCardMenu, DownArrow, Sparkle, PerformersTable, PipelineFunnel, DraggableCard, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { adminKpis, pipelineData, monthlyRevenueData, repPerformanceTable } from '../data/mockData';
 
 const useChartConfig = () => {
@@ -87,7 +87,7 @@ const AnnualRevenueTarget = () => {
 };
 
 const MonthlyRevenueTarget = () => {
-  const { chartType, colors, showGrid, actualValue, targetValue, potentialValue } = useChartConfig();
+  const { chartType, colors, showGrid, showLabels, actualValue, targetValue, potentialValue } = useChartConfig();
   const current = actualValue ?? 5;
   const target = targetValue ?? 10;
   const potential = potentialValue ?? 12;
@@ -122,9 +122,15 @@ const MonthlyRevenueTarget = () => {
                 axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }}
                 tickFormatter={(v) => v === 0 ? '0' : `${v / 1000}K`} />
               <YAxis type="category" dataKey="name" hide />
-              <Bar dataKey="a" stackId="r" fill={colors.seg1} barSize={32} radius={[4, 0, 0, 4]} />
-              <Bar dataKey="b" stackId="r" fill={colors.seg2} barSize={32} />
-              <Bar dataKey="c" stackId="r" fill={colors.seg3} barSize={32} radius={[0, 4, 4, 0]} />
+              <Bar dataKey="a" stackId="r" fill={colors.seg1} barSize={32} radius={[4, 0, 0, 4]}>
+                {showLabels && <LabelList dataKey="a" position="center" formatter={(v) => `${v / 1000}K`} fill="#ffffff" fontSize={10} />}
+              </Bar>
+              <Bar dataKey="b" stackId="r" fill={colors.seg2} barSize={32}>
+                {showLabels && <LabelList dataKey="b" position="center" formatter={(v) => `${v / 1000}K`} fill="#ffffff" fontSize={10} />}
+              </Bar>
+              <Bar dataKey="c" stackId="r" fill={colors.seg3} barSize={32} radius={[0, 4, 4, 0]}>
+                {showLabels && <LabelList dataKey="c" position="center" formatter={(v) => `${v / 1000}K`} fill="#585858" fontSize={10} />}
+              </Bar>
             </BarChart>
           )}
         </ResponsiveContainer>
@@ -197,6 +203,16 @@ const FounderView = () => {
     rows: pipelineData.map((d) => [d.name, d.value]),
   };
 
+  const [targetsOrder, setTargetsOrder] = useState([0, 1]);
+  const handleTargetsReorder = (from, to) => {
+    setTargetsOrder((order) => {
+      const next = [...order];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
+
   const cards = {
     kpis: (
       <Card cardId="founder-kpi-pills">
@@ -214,35 +230,39 @@ const FounderView = () => {
       </Card>
     ),
     targets: (
-    <div className="grid grid-cols-2 gap-5">
-      {/* Annual Revenue Target */}
-      <Card cardId="founder-annual-revenue" data={annualTableData}>
-        <CardHeader title="Annual Revenue Target" />
-        <AnnualRevenueTarget />
-        <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
-          <span>Improve 30% + lift in calls to conversion</span>
-          <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
-        </div>
-      </Card>
-
-      {/* Monthly Revenue Target */}
-      <Card cardId="founder-monthly-revenue" data={monthlyTableData}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-1.5">
-            <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5 hover:bg-[#f4f6f8] transition-colors duration-150">
-              Check how to improve
-            </button>
-            <DotsIcon />
-          </div>
-        </div>
-        <MonthlyRevenueTarget />
-      </Card>
+    <div className="flex gap-6">
+      {targetsOrder.map((cardKey, index) => (
+        <DraggableCard key={cardKey} index={index} onReorder={handleTargetsReorder} className="flex-1">
+          {cardKey === 0 ? (
+            <Card cardId="founder-annual-revenue" data={annualTableData} hasChart>
+              <CardHeader title="Annual Revenue Target" />
+              <AnnualRevenueTarget />
+              <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
+                <span>Improve 30% + lift in calls to conversion</span>
+                <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
+              </div>
+            </Card>
+          ) : (
+            <Card cardId="founder-monthly-revenue" data={monthlyTableData} hasChart>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5 hover:bg-[#f4f6f8] transition-colors duration-150">
+                    Check how to improve
+                  </button>
+                  <ConnectedCardMenu />
+                </div>
+              </div>
+              <MonthlyRevenueTarget />
+            </Card>
+          )}
+        </DraggableCard>
+      ))}
     </div>
     ),
     pipeline: (

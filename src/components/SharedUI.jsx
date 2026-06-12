@@ -168,6 +168,36 @@ export const CardHeader = ({ title }) => {
   );
 };
 
+// ---------- standalone three-dot menu wired to CardContext (for custom headers) ----------
+export const ConnectedCardMenu = () => {
+  const ctx = useContext(CardContext);
+
+  const handleAction = (action) => {
+    switch (action) {
+      case 'Full screen':
+        ctx?.openModal('fullscreen');
+        break;
+      case 'Settings':
+        ctx?.openModal('settings');
+        break;
+      case 'Duplicate':
+        ctx?.requestDuplicate();
+        ctx?.showToast('Card duplicated');
+        break;
+      case 'Export':
+        ctx?.showToast('Exported to CSV');
+        break;
+      case 'Delete':
+        ctx?.requestDelete();
+        break;
+      default:
+        break;
+    }
+  };
+
+  return <CardMenu onAction={handleAction} />;
+};
+
 // ---------- persistent chart config registry (survives modal close) ----------
 export const ChartConfigRegistryContext = createContext(null);
 export const CardIdContext = createContext(null);
@@ -227,7 +257,9 @@ export const CHART_DEFAULTS = {
   },
   'founder-monthly-revenue': {
     chartType: 'bar',
-    colors: { seg1: '#3ca30f', seg2: '#80cc60', seg3: '#dbf8f7' },
+    colors: { seg1: '#2d9e6b', seg2: '#5bc4bf', seg3: '#c8eeec' },
+    showGrid: true,
+    showLabels: true,
     actualValue: null,
     targetValue: null,
     potentialValue: null,
@@ -300,7 +332,7 @@ const SETTINGS_SCHEMA = {
   ],
   'founder-monthly-revenue': [
     { key: 'Chart type', type: 'tabs', path: 'chartType', options: ['bar', 'donut'] },
-    { key: 'Colors', type: 'multiColor', swatches: ['#3ca30f', '#80cc60', '#dbf8f7', '#7ed3cf', '#2477e8'], items: [
+    { key: 'Colors', type: 'multiColor', swatches: ['#2d9e6b', '#5bc4bf', '#c8eeec'], items: [
       { path: 'colors.seg1', label: 'Segment 1' },
       { path: 'colors.seg2', label: 'Segment 2' },
       { path: 'colors.seg3', label: 'Segment 3' },
@@ -308,6 +340,10 @@ const SETTINGS_SCHEMA = {
     { key: 'Actual Value', type: 'number', path: 'actualValue' },
     { key: 'Target Value', type: 'number', path: 'targetValue' },
     { key: 'Potential Value', type: 'number', path: 'potentialValue' },
+    { key: 'Visual Settings', type: 'toggleGroup', items: [
+      { path: 'showGrid', label: 'Show Grid' },
+      { path: 'showLabels', label: 'Show Labels' },
+    ] },
     { key: 'Data', type: 'table' },
   ],
   'founder-pipeline': [
@@ -335,6 +371,8 @@ const SETTINGS_SCHEMA = {
 };
 
 export const NO_SETTINGS_CARDS = ['agent-stats-row', 'agent-targets', 'manager-kpi-pills', 'founder-kpi-pills', 'founder-top-performers'];
+
+export const CHART_CARD_IDS = Object.keys(CHART_DEFAULTS);
 
 const ToggleSwitch = ({ checked, onChange }) => (
   <span
@@ -400,6 +438,17 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
       );
     case 'toggle':
       return <ToggleSwitch checked={getPath(config, row.path)} onChange={(v) => onUpdate(row.path, v)} />;
+    case 'toggleGroup':
+      return (
+        <div className="flex flex-col gap-3">
+          {row.items.map((item) => (
+            <div key={item.path} className="flex items-center justify-between">
+              <span className="text-[12px] text-[#585858]">{item.label}</span>
+              <ToggleSwitch checked={getPath(config, item.path)} onChange={(v) => onUpdate(item.path, v)} />
+            </div>
+          ))}
+        </div>
+      );
     case 'radio':
       return (
         <div className="flex flex-col gap-2">
@@ -453,11 +502,11 @@ const AccordionRow = ({ label, open, onToggle, row, config, onUpdate, data }) =>
   </div>
 );
 
-const FullscreenModal = ({ mode, cardId, data, onClose, children }) => {
+const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) => {
   const { getConfig, setConfig } = useContext(ChartConfigRegistryContext);
   const [openRow, setOpenRow] = useState(null);
 
-  const statOnly = NO_SETTINGS_CARDS.includes(cardId);
+  const statOnly = hasChart !== undefined ? !hasChart : NO_SETTINGS_CARDS.includes(cardId);
   const schema = SETTINGS_SCHEMA[cardId];
   const defaults = CHART_DEFAULTS[cardId] || {};
   const config = getConfig(cardId, defaults);
@@ -508,7 +557,7 @@ const FullscreenModal = ({ mode, cardId, data, onClose, children }) => {
   );
 };
 
-export const Card = ({ children, className = '', cardId, data }) => {
+export const Card = ({ children, className = '', cardId, data, hasChart }) => {
   const [modalMode, setModalMode] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [removed, setRemoved] = useState(false);
@@ -559,7 +608,7 @@ export const Card = ({ children, className = '', cardId, data }) => {
             )}
 
             {modalMode && (
-              <FullscreenModal mode={modalMode} cardId={cardId} data={data} onClose={() => setModalMode(null)}>
+              <FullscreenModal mode={modalMode} cardId={cardId} data={data} hasChart={hasChart} onClose={() => setModalMode(null)}>
                 {children}
               </FullscreenModal>
             )}
@@ -568,7 +617,7 @@ export const Card = ({ children, className = '', cardId, data }) => {
       </CardIdContext.Provider>
 
       {duplicates.map((id) => (
-        <Card key={id} className={className} cardId={cardId} data={data}>{children}</Card>
+        <Card key={id} className={className} cardId={cardId} data={data} hasChart={hasChart}>{children}</Card>
       ))}
     </>
   );

@@ -17,7 +17,7 @@ function App() {
 
   return (
     <ChartConfigRegistryProvider>
-      <div className="w-[1440px] overflow-x-hidden flex tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div className="w-full overflow-x-hidden flex tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
         <ProfileSwitcher selectedProfile={selectedProfile} setSelectedProfile={setSelectedProfile} />
         <Sidebar />
         <SecondSidebar />
