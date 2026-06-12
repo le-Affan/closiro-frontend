@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext, createContext } from 'react';
+import { useState, useEffect, useRef, useContext, createContext, Children, isValidElement } from 'react';
 import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
 } from 'recharts';
@@ -24,7 +24,59 @@ const ChevronDown = ({ open }) => (
   </svg>
 );
 
-const MENU_ITEMS = ['Full screen', 'Settings', 'Rename', 'Duplicate', 'Export', 'Delete'];
+// ---------- menu item icons (14px, #737373) ----------
+const MaximizeIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" stroke="#737373" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const SettingsIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="3" stroke="#737373" strokeWidth="2" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="#737373" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const PencilIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" stroke="#737373" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const CopyIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <rect x="9" y="9" width="13" height="13" rx="2" stroke="#737373" strokeWidth="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="#737373" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const DownloadIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="#737373" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <polyline points="7 10 12 15 17 10" stroke="#737373" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <line x1="12" y1="15" x2="12" y2="3" stroke="#737373" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <path d="M3 6h18" stroke="#737373" strokeWidth="2" strokeLinecap="round" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke="#737373" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#737373" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <line x1="10" y1="11" x2="10" y2="17" stroke="#737373" strokeWidth="2" strokeLinecap="round" />
+    <line x1="14" y1="11" x2="14" y2="17" stroke="#737373" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
+const MENU_ITEMS = [
+  { label: 'Full screen', icon: MaximizeIcon },
+  { label: 'Settings', icon: SettingsIcon },
+  { label: 'Rename', icon: PencilIcon },
+  { label: 'Duplicate', icon: CopyIcon },
+  { label: 'Export', icon: DownloadIcon },
+  { label: 'Delete', icon: TrashIcon },
+];
 
 export const CardMenu = ({ onAction }) => {
   const [open, setOpen] = useState(false);
@@ -43,13 +95,14 @@ export const CardMenu = ({ onAction }) => {
       </button>
       {open && (
         <div className="absolute right-0 top-6 z-20 bg-white border border-[#e0e0e0] rounded-md shadow-md py-1 w-36">
-          {MENU_ITEMS.map((item) => (
+          {MENU_ITEMS.map(({ label, icon: Icon }) => (
             <button
-              key={item}
-              onClick={() => { setOpen(false); onAction(item); }}
-              className={`block w-full text-left px-3 py-1.5 text-[12px] hover:bg-[#f5f5f5] ${item === 'Delete' ? 'text-[#de3226]' : 'text-[#585858]'}`}
+              key={label}
+              onClick={() => { setOpen(false); onAction(label); }}
+              className={`flex items-center gap-2 w-full text-left px-3 py-1.5 text-[12px] hover:bg-[#f5f5f5] ${label === 'Delete' ? 'text-[#de3226]' : 'text-[#585858]'}`}
             >
-              {item}
+              <Icon />
+              {label}
             </button>
           ))}
         </div>
@@ -68,13 +121,16 @@ export const CardHeader = ({ title }) => {
   const handleAction = (action) => {
     switch (action) {
       case 'Full screen':
+        ctx?.openModal('fullscreen');
+        break;
       case 'Settings':
-        ctx?.openFullscreen();
+        ctx?.openModal('settings');
         break;
       case 'Rename':
         setRenaming(true);
         break;
       case 'Duplicate':
+        ctx?.requestDuplicate();
         ctx?.showToast('Card duplicated');
         break;
       case 'Export':
@@ -127,26 +183,46 @@ const AccordionRow = ({ label }) => {
   );
 };
 
-const FullscreenModal = ({ onClose, children }) => (
+// ---------- detect whether children render a recharts chart ----------
+const elementHasChart = (node) => {
+  if (!isValidElement(node)) return false;
+  if (node.type === ResponsiveContainer) return true;
+  return Children.toArray(node.props?.children).some(elementHasChart);
+};
+
+const hasChart = (children) => Children.toArray(children).some(elementHasChart);
+
+const FullscreenModal = ({ mode, statOnly, onClose, children }) => (
   <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-    <div className="relative bg-white rounded-lg shadow-lg w-[90vw] max-w-5xl h-[680px] flex overflow-hidden">
+    <div className="relative bg-white rounded-lg shadow-lg w-[90vw] max-w-[1200px] h-[80vh] flex flex-row overflow-hidden">
       <button onClick={onClose} className="absolute top-3 right-3 text-[#949494] hover:text-[#585858] text-[16px] leading-none z-10">✕</button>
-      <div className="flex-1 p-5 overflow-auto" style={{ height: 600 }}>
-        {children}
+      <div className="flex-1 p-8 overflow-auto flex items-center justify-center">
+        {statOnly ? (
+          <div className="[&_.stat-number]:text-3xl [&_.stat-label]:text-sm p-12 flex items-center justify-center w-full">
+            {children}
+          </div>
+        ) : (
+          <div style={{ height: 500, width: '100%' }}>
+            {children}
+          </div>
+        )}
       </div>
-      <div className="w-[320px] border-l border-[#e0e0e0] p-5 overflow-auto shrink-0">
-        <h4 className="text-[13px] font-semibold text-[#585858] mb-3">Widget settings</h4>
-        {ACCORDION_ROWS.map((row) => <AccordionRow key={row} label={row} />)}
-      </div>
+      {mode === 'settings' && !statOnly && (
+        <div className="w-[320px] border-l border-[#e0e0e0] p-5 overflow-auto shrink-0">
+          <h4 className="text-[13px] font-semibold text-[#585858] mb-3">Widget settings</h4>
+          {ACCORDION_ROWS.map((row) => <AccordionRow key={row} label={row} />)}
+        </div>
+      )}
     </div>
   </div>
 );
 
 export const Card = ({ children, className = '' }) => {
-  const [fullscreen, setFullscreen] = useState(false);
+  const [modalMode, setModalMode] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [removed, setRemoved] = useState(false);
   const [toast, setToast] = useState(null);
+  const [duplicates, setDuplicates] = useState([]);
 
   useEffect(() => {
     if (!toast) return;
@@ -157,40 +233,74 @@ export const Card = ({ children, className = '' }) => {
   if (removed) return null;
 
   const ctx = {
-    openFullscreen: () => setFullscreen(true),
+    openModal: setModalMode,
     showToast: setToast,
     requestDelete: () => setConfirmDelete(true),
+    requestDuplicate: () => setDuplicates((d) => [...d, Date.now()]),
   };
 
   return (
-    <CardContext.Provider value={ctx}>
-      <div className={`relative group bg-white border border-[#e0e0e0] rounded-lg shadow-sm p-5 ${className}`}>
-        <div className="absolute top-2 left-2 text-[#bebebe] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-move select-none">⠿</div>
-        {children}
+    <>
+      <CardContext.Provider value={ctx}>
+        <div className={`relative group bg-white border border-[#e0e0e0] rounded-lg shadow-sm p-5 ${className}`}>
+          <div data-drag-handle="true" className="absolute top-2 left-2 text-[#bebebe] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab select-none">⠿</div>
+          {children}
 
-        {toast && (
-          <div className="fixed bottom-6 right-6 bg-[#585858] text-white text-[12px] px-4 py-2 rounded-md shadow-lg z-50">{toast}</div>
-        )}
+          {toast && (
+            <div className="fixed bottom-6 right-6 bg-[#585858] text-white text-[12px] px-4 py-2 rounded-md shadow-lg z-50">{toast}</div>
+          )}
 
-        {confirmDelete && (
-          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg shadow-lg p-5 w-72">
-              <p className="text-[13px] text-[#585858] mb-4">Remove this widget?</p>
-              <div className="flex justify-end gap-2">
-                <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 text-[12px] rounded-md border border-[#e0e0e0] text-[#585858]">Cancel</button>
-                <button onClick={() => { setRemoved(true); setConfirmDelete(false); }} className="px-3 py-1.5 text-[12px] rounded-md bg-[#de3226] text-white">Remove</button>
+          {confirmDelete && (
+            <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+              <div className="bg-white rounded-lg shadow-lg p-5 w-72">
+                <p className="text-[13px] text-[#585858] mb-4">Remove this widget?</p>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 text-[12px] rounded-md border border-[#e0e0e0] text-[#585858]">Cancel</button>
+                  <button onClick={() => { setRemoved(true); setConfirmDelete(false); }} className="px-3 py-1.5 text-[12px] rounded-md bg-[#de3226] text-white">Remove</button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {fullscreen && (
-          <FullscreenModal onClose={() => setFullscreen(false)}>
-            {children}
-          </FullscreenModal>
-        )}
-      </div>
-    </CardContext.Provider>
+          {modalMode && (
+            <FullscreenModal mode={modalMode} statOnly={!hasChart(children)} onClose={() => setModalMode(null)}>
+              {children}
+            </FullscreenModal>
+          )}
+        </div>
+      </CardContext.Provider>
+
+      {duplicates.map((id) => (
+        <Card key={id} className={className}>{children}</Card>
+      ))}
+    </>
+  );
+};
+
+// ---------- HTML5 drag-and-drop reorder wrapper ----------
+export const DraggableCard = ({ index, onReorder, children, className = '' }) => {
+  const [draggable, setDraggable] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  return (
+    <div
+      draggable={draggable}
+      onDragStart={(e) => e.dataTransfer.setData('text/plain', String(index))}
+      onDragEnd={() => setDraggable(false)}
+      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragOver(false);
+        const from = Number(e.dataTransfer.getData('text/plain'));
+        if (from !== index) onReorder(from, index);
+      }}
+      onMouseDown={(e) => { if (e.target.closest('[data-drag-handle]')) setDraggable(true); }}
+      onMouseUp={() => setDraggable(false)}
+      className={`rounded-lg ${dragOver ? 'outline outline-2 outline-dashed outline-[#2477e8]' : ''} ${className}`}
+    >
+      {children}
+    </div>
   );
 };
 

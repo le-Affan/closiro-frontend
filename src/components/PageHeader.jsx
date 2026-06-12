@@ -260,20 +260,20 @@ const PeriodActionButton = () => {
 
 const WIDGET_OPTIONS = {
   all: [
-    { name: 'KPI Counter', desc: 'Single metric with trend indicator' },
-    { name: 'Text Note', desc: 'Free-form note or annotation' },
+    { name: 'KPI Counter', type: 'kpi-counter', desc: 'Single metric with trend indicator' },
+    { name: 'Text Note', type: 'text-note', desc: 'Free-form note or annotation' },
   ],
   'Sales Agent': [
-    { name: 'Daily Goal Tracker', desc: 'Track progress toward daily targets' },
-    { name: 'My Call Log', desc: 'Recent calls and outcomes' },
+    { name: 'Daily Goal Tracker', type: 'daily-goal-tracker', desc: 'Track progress toward daily targets' },
+    { name: 'My Call Log', type: 'my-call-log', desc: 'Recent calls and outcomes' },
   ],
   'Sales Manager': [
-    { name: 'Team Leaderboard', desc: 'Rank reps by performance score' },
-    { name: 'Conversion Funnel', desc: 'Stage-by-stage pipeline breakdown' },
+    { name: 'Team Leaderboard', type: 'team-leaderboard', desc: 'Rank reps by performance score' },
+    { name: 'Conversion Funnel', type: 'conversion-funnel', desc: 'Stage-by-stage pipeline breakdown' },
   ],
   'Admin/Founder': [
-    { name: 'Revenue Forecast', desc: 'AI-projected revenue trend' },
-    { name: 'AI Insights Panel', desc: 'Automated signals and recommendations' },
+    { name: 'Revenue Forecast', type: 'revenue-forecast', desc: 'AI-projected revenue trend' },
+    { name: 'AI Insights Panel', type: 'ai-insights-panel', desc: 'Automated signals and recommendations' },
   ],
 };
 
@@ -290,7 +290,10 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
 
   const options = [...WIDGET_OPTIONS.all, ...(WIDGET_OPTIONS[selectedProfile] || [])];
 
-  const handleSelect = () => {
+  const handleSelect = (opt) => {
+    window.dispatchEvent(new CustomEvent('addWidget', {
+      detail: { name: opt.name, type: opt.type, profile: selectedProfile },
+    }));
     setOpen(false);
     setToast(true);
     setTimeout(() => setToast(false), 2000);
@@ -321,7 +324,7 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
               {options.map((opt) => (
                 <button
                   key={opt.name}
-                  onClick={handleSelect}
+                  onClick={() => handleSelect(opt)}
                   className="text-left border border-[#e0e0e0] rounded-lg p-2.5 hover:bg-[#fafafa]"
                 >
                   <div className="flex items-center gap-1.5 mb-1">

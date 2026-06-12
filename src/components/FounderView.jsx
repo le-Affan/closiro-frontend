@@ -1,27 +1,29 @@
+import { useState, useEffect } from 'react';
 import {
   BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, ResponsiveContainer,
 } from 'recharts';
-import { Card, CardHeader, DownArrow, DotsIcon, Sparkle, PerformersTable } from './SharedUI';
+import { Card, CardHeader, DownArrow, DotsIcon, Sparkle, PerformersTable, DraggableCard } from './SharedUI';
 import { adminKpis, pipelineData, monthlyRevenueData, repPerformanceTable } from '../data/mockData';
 
-const FounderView = () => (
-  <>
-    {/* KPI pills */}
-    <Card>
-      <div className="flex items-center gap-8">
-        {adminKpis.map((kpi) => (
-          <div key={kpi.label} className="flex items-center gap-2">
-            <DownArrow color={kpi.color} />
-            <div>
-              <div className="text-[11px] text-[#949494]">{kpi.label}</div>
-              <div className="text-[15px] font-semibold text-[#585858]">{kpi.value}</div>
+const FounderView = () => {
+  const cards = {
+    kpis: (
+      <Card>
+        <div className="flex items-center gap-8">
+          {adminKpis.map((kpi) => (
+            <div key={kpi.label} className="flex items-center gap-2">
+              <DownArrow color={kpi.color} />
+              <div>
+                <div className="text-[11px] text-[#949494]">{kpi.label}</div>
+                <div className="text-[15px] font-semibold text-[#585858]">{kpi.value}</div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </Card>
-
+          ))}
+        </div>
+      </Card>
+    ),
+    targets: (
     <div className="grid grid-cols-2 gap-5">
       {/* Annual Revenue Target */}
       <Card>
@@ -124,45 +126,83 @@ const FounderView = () => (
         </div>
       </Card>
     </div>
-
-    {/* Pipeline Conversation */}
-    <Card>
-      <CardHeader title="Pipeline conversation" />
-      <div className="mb-3">
-        <span className="bg-[#eaf7e9] text-[#3ca30f] text-[11px] font-medium rounded-full px-3 py-1">
-          AI projects 28% conversion by Q3
-        </span>
-      </div>
-      <div className="flex items-center">
-        <div className="flex-1" style={{ height: 240 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={pipelineData} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" vertical={false} />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#737373', fontSize: 11 }} />
-              <YAxis domain={[0, 20]} ticks={[0, 5, 10, 15, 20]} axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }} />
-              <Bar dataKey="value" fill="#7ed3cf" barSize={48} radius={[4, 4, 0, 0]}>
-                {pipelineData.map((entry, i) => (
-                  <Cell key={i} fill={entry.name === 'Won' ? '#3ca30f' : '#7ed3cf'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+    ),
+    pipeline: (
+      <Card>
+        <CardHeader title="Pipeline conversation" />
+        <div className="mb-3">
+          <span className="bg-[#eaf7e9] text-[#3ca30f] text-[11px] font-medium rounded-full px-3 py-1">
+            AI projects 28% conversion by Q3
+          </span>
         </div>
-        <div className="flex flex-col items-center gap-2 pl-6 w-32 shrink-0">
-          <svg width="20" height="40" viewBox="0 0 20 40" fill="none">
-            <path d="M10 2V36M10 36L3 29M10 36L17 29" stroke="#3ca30f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span className="text-[12px] font-semibold text-[#3ca30f] text-center">20% Conversion to Won</span>
+        <div className="flex items-center">
+          <div className="flex-1" style={{ height: 240 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={pipelineData} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" vertical={false} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#737373', fontSize: 11 }} />
+                <YAxis domain={[0, 20]} ticks={[0, 5, 10, 15, 20]} axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }} />
+                <Bar dataKey="value" fill="#7ed3cf" barSize={48} radius={[4, 4, 0, 0]}>
+                  {pipelineData.map((entry, i) => (
+                    <Cell key={i} fill={entry.name === 'Won' ? '#3ca30f' : '#7ed3cf'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex flex-col items-center gap-2 pl-6 w-32 shrink-0">
+            <svg width="20" height="40" viewBox="0 0 20 40" fill="none">
+              <path d="M10 2V36M10 36L3 29M10 36L17 29" stroke="#3ca30f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="text-[12px] font-semibold text-[#3ca30f] text-center">20% Conversion to Won</span>
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    ),
+    performers: (
+      <Card>
+        <CardHeader title="Top Performers" />
+        <PerformersTable data={repPerformanceTable} />
+      </Card>
+    ),
+  };
 
-    {/* Top Performers */}
-    <Card>
-      <CardHeader title="Top Performers" />
-      <PerformersTable data={repPerformanceTable} />
-    </Card>
-  </>
-);
+  const [cardOrder, setCardOrder] = useState(['kpis', 'targets', 'pipeline', 'performers']);
+
+  const handleReorder = (from, to) => {
+    setCardOrder((order) => {
+      const next = [...order];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
+
+  const [addedWidgets, setAddedWidgets] = useState([]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      setAddedWidgets((prev) => [...prev, { name: e.detail.name, type: e.detail.type, id: Date.now() }]);
+    };
+    window.addEventListener('addWidget', handler);
+    return () => window.removeEventListener('addWidget', handler);
+  }, []);
+
+  return (
+    <>
+      {cardOrder.map((id, index) => (
+        <DraggableCard key={id} index={index} onReorder={handleReorder}>
+          {cards[id]}
+        </DraggableCard>
+      ))}
+      {addedWidgets.map((w) => (
+        <Card key={w.id}>
+          <CardHeader title={w.name} />
+          <p className="text-[12px] text-[#949494]">Widget type: {w.type}</p>
+        </Card>
+      ))}
+    </>
+  );
+};
 
 export default FounderView;
