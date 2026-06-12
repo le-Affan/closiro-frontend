@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useContext, createContext } from 'react';
 import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
 } from 'recharts';
@@ -18,23 +18,181 @@ export const DotsIcon = () => (
   </svg>
 );
 
-export const CardHeader = ({ title }) => (
-  <div className="flex items-center justify-between mb-4">
-    <div className="flex items-center gap-1.5">
-      <h3 className="text-[13px] font-semibold text-[#585858]">{title}</h3>
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-        <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+const ChevronDown = ({ open }) => (
+  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
+    <path d="M2 3.5L5 6.5L8 3.5" stroke="#949494" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const MENU_ITEMS = ['Full screen', 'Settings', 'Rename', 'Duplicate', 'Export', 'Delete'];
+
+export const CardMenu = ({ onAction }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen((o) => !o)} className="cursor-pointer">
+        <DotsIcon />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-6 z-20 bg-white border border-[#e0e0e0] rounded-md shadow-md py-1 w-36">
+          {MENU_ITEMS.map((item) => (
+            <button
+              key={item}
+              onClick={() => { setOpen(false); onAction(item); }}
+              className={`block w-full text-left px-3 py-1.5 text-[12px] hover:bg-[#f5f5f5] ${item === 'Delete' ? 'text-[#de3226]' : 'text-[#585858]'}`}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
-    <DotsIcon />
+  );
+};
+
+const CardContext = createContext(null);
+
+export const CardHeader = ({ title }) => {
+  const ctx = useContext(CardContext);
+  const [renaming, setRenaming] = useState(false);
+  const [name, setName] = useState(title);
+
+  const handleAction = (action) => {
+    switch (action) {
+      case 'Full screen':
+      case 'Settings':
+        ctx?.openFullscreen();
+        break;
+      case 'Rename':
+        setRenaming(true);
+        break;
+      case 'Duplicate':
+        ctx?.showToast('Card duplicated');
+        break;
+      case 'Export':
+        ctx?.showToast('Exported to CSV');
+        break;
+      case 'Delete':
+        ctx?.requestDelete();
+        break;
+      default:
+        break;
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between mb-4">
+      {renaming ? (
+        <input
+          autoFocus
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={() => setRenaming(false)}
+          onKeyDown={(e) => e.key === 'Enter' && setRenaming(false)}
+          className="text-[13px] font-semibold text-[#585858] border border-[#e0e0e0] rounded px-1 outline-none"
+        />
+      ) : (
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-[13px] font-semibold text-[#585858]">{name}</h3>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      )}
+      <CardMenu onAction={handleAction} />
+    </div>
+  );
+};
+
+const ACCORDION_ROWS = ['Chart type', 'Actual Value', 'Target Value', 'Potential Value', 'Colors', 'Visual Settings', 'Data'];
+
+const AccordionRow = ({ label }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-[#e0e0e0]">
+      <button onClick={() => setOpen((o) => !o)} className="w-full flex items-center justify-between py-2.5 text-[12px] font-medium text-[#585858]">
+        {label}
+        <ChevronDown open={open} />
+      </button>
+      {open && <div className="pb-2.5 text-[11px] text-[#949494]">No options yet.</div>}
+    </div>
+  );
+};
+
+const FullscreenModal = ({ onClose, children }) => (
+  <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+    <div className="relative bg-white rounded-lg shadow-lg w-[90vw] max-w-5xl h-[680px] flex overflow-hidden">
+      <button onClick={onClose} className="absolute top-3 right-3 text-[#949494] hover:text-[#585858] text-[16px] leading-none z-10">✕</button>
+      <div className="flex-1 p-5 overflow-auto" style={{ height: 600 }}>
+        {children}
+      </div>
+      <div className="w-[320px] border-l border-[#e0e0e0] p-5 overflow-auto shrink-0">
+        <h4 className="text-[13px] font-semibold text-[#585858] mb-3">Widget settings</h4>
+        {ACCORDION_ROWS.map((row) => <AccordionRow key={row} label={row} />)}
+      </div>
+    </div>
   </div>
 );
 
-export const Card = ({ children, className = '' }) => (
-  <div className={`bg-white border border-[#e0e0e0] rounded-lg shadow-sm p-5 ${className}`}>
-    {children}
-  </div>
-);
+export const Card = ({ children, className = '' }) => {
+  const [fullscreen, setFullscreen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [removed, setRemoved] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 2000);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  if (removed) return null;
+
+  const ctx = {
+    openFullscreen: () => setFullscreen(true),
+    showToast: setToast,
+    requestDelete: () => setConfirmDelete(true),
+  };
+
+  return (
+    <CardContext.Provider value={ctx}>
+      <div className={`relative group bg-white border border-[#e0e0e0] rounded-lg shadow-sm p-5 ${className}`}>
+        <div className="absolute top-2 left-2 text-[#bebebe] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-move select-none">⠿</div>
+        {children}
+
+        {toast && (
+          <div className="fixed bottom-6 right-6 bg-[#585858] text-white text-[12px] px-4 py-2 rounded-md shadow-lg z-50">{toast}</div>
+        )}
+
+        {confirmDelete && (
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+            <div className="bg-white rounded-lg shadow-lg p-5 w-72">
+              <p className="text-[13px] text-[#585858] mb-4">Remove this widget?</p>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 text-[12px] rounded-md border border-[#e0e0e0] text-[#585858]">Cancel</button>
+                <button onClick={() => { setRemoved(true); setConfirmDelete(false); }} className="px-3 py-1.5 text-[12px] rounded-md bg-[#de3226] text-white">Remove</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {fullscreen && (
+          <FullscreenModal onClose={() => setFullscreen(false)}>
+            {children}
+          </FullscreenModal>
+        )}
+      </div>
+    </CardContext.Provider>
+  );
+};
 
 // ---------- Sparkle icon (AI Potential) ----------
 export const Sparkle = () => (
