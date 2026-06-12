@@ -1,61 +1,85 @@
 import { useState, useEffect, useContext } from 'react';
 import {
-  BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, ResponsiveContainer,
+  BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
+  XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList,
 } from 'recharts';
-import { Card, CardHeader, DownArrow, DotsIcon, Sparkle, PerformersTable, DraggableCard, ChartConfigContext } from './SharedUI';
+import { Card, CardHeader, DownArrow, DotsIcon, Sparkle, PerformersTable, PipelineFunnel, DraggableCard, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { adminKpis, pipelineData, monthlyRevenueData, repPerformanceTable } from '../data/mockData';
 
+const useChartConfig = () => {
+  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const cardId = useContext(CardIdContext);
+  return getConfig(cardId, CHART_DEFAULTS[cardId]);
+};
+
 const AnnualRevenueTarget = () => {
-  const { colors, actualValue, targetValue, potentialValue } = useContext(ChartConfigContext);
-  const current = actualValue ?? '62K';
-  const target = targetValue ?? '100K';
-  const potential = potentialValue ?? '150K';
+  const { chartType, colors, actualValue, targetValue, potentialValue } = useChartConfig();
+  const current = actualValue ?? 62;
+  const target = targetValue ?? 100;
+  const potential = potentialValue ?? 150;
 
   return (
     <>
       <div style={{ height: 180 }} className="relative">
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={[{ value: 62 }, { value: 38 }]}
-              dataKey="value"
-              cx="50%"
-              cy="100%"
-              startAngle={180}
-              endAngle={0}
-              innerRadius={75}
-              outerRadius={110}
-              stroke="none"
-            >
-              <Cell fill={colors.primary} />
-              <Cell fill="#dbf2f0" />
-            </Pie>
-          </PieChart>
+          {chartType === 'bar' ? (
+            <BarChart data={[
+              { name: 'Current', value: Number(current) },
+              { name: 'Target', value: Number(target) },
+              { name: 'AI Potential', value: Number(potential) },
+            ]} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 12 }} />
+              <YAxis hide />
+              <Bar dataKey="value" radius={[4, 4, 0, 0]} barSize={48}>
+                <Cell fill={colors.arc1} />
+                <Cell fill={colors.arc2} />
+                <Cell fill={colors.arc2} />
+              </Bar>
+            </BarChart>
+          ) : (
+            <PieChart>
+              <Pie
+                data={[{ value: 62 }, { value: 38 }]}
+                dataKey="value"
+                cx="50%"
+                cy="100%"
+                startAngle={180}
+                endAngle={0}
+                innerRadius={75}
+                outerRadius={110}
+                stroke="none"
+              >
+                <Cell fill={colors.arc1} />
+                <Cell fill={colors.arc2} />
+              </Pie>
+            </PieChart>
+          )}
         </ResponsiveContainer>
-        <div className="absolute bottom-1 left-0 right-0 flex justify-between px-4 text-[10px] text-[#949494]">
-          <span>0</span>
-          <span>10K</span>
-          <span>20K</span>
-          <span>40K</span>
-          <span>60K</span>
-          <span>80K</span>
-        </div>
+        {chartType !== 'bar' && (
+          <div className="absolute bottom-1 left-0 right-0 flex justify-between px-4 text-[10px] text-[#949494]">
+            <span>0</span>
+            <span>10K</span>
+            <span>20K</span>
+            <span>40K</span>
+            <span>60K</span>
+            <span>80K</span>
+          </div>
+        )}
       </div>
       <div className="flex justify-between mt-4 px-2">
         <div>
           <div className="text-[10px] text-[#949494]">CURRENT</div>
-          <div className="text-[15px] font-semibold text-[#585858]">{current}</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{current}K</div>
         </div>
         <div>
           <div className="text-[10px] text-[#949494]">TARGET</div>
-          <div className="text-[15px] font-semibold text-[#585858]">{target}</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{target}K</div>
         </div>
         <div>
           <div className="text-[10px] text-[#949494] flex items-center gap-1">
             <Sparkle />AI POTENTIAL
           </div>
-          <div className="text-[15px] font-semibold text-[#585858]">{potential}</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{potential}K</div>
         </div>
       </div>
     </>
@@ -63,51 +87,119 @@ const AnnualRevenueTarget = () => {
 };
 
 const MonthlyRevenueTarget = () => {
-  const { colors, showGrid, actualValue, targetValue, potentialValue } = useContext(ChartConfigContext);
-  const current = actualValue ?? '5K';
-  const target = targetValue ?? '10K';
-  const potential = potentialValue ?? '12K';
+  const { chartType, colors, showGrid, actualValue, targetValue, potentialValue } = useChartConfig();
+  const current = actualValue ?? 5;
+  const target = targetValue ?? 10;
+  const potential = potentialValue ?? 12;
 
   return (
     <>
       <div style={{ height: 60 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={monthlyRevenueData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" horizontal={false} strokeOpacity={showGrid ? 1 : 0} />
-            <XAxis type="number" domain={[0, 12000]} ticks={[0, 2000, 4000, 6000, 8000, 10000]}
-              axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }}
-              tickFormatter={(v) => v === 0 ? '0' : `${v / 1000}K`} />
-            <YAxis type="category" dataKey="name" hide />
-            <Bar dataKey="a" stackId="r" fill={colors.primary} barSize={32} radius={[4, 0, 0, 4]} />
-            <Bar dataKey="b" stackId="r" fill="#80cc60" barSize={32} />
-            <Bar dataKey="c" stackId="r" fill="#cdeec1" barSize={32} radius={[0, 4, 4, 0]} />
-          </BarChart>
+          {chartType === 'donut' ? (
+            <PieChart>
+              <Pie
+                data={monthlyRevenueData.map((d) => ({ value: d.a })).concat(
+                  monthlyRevenueData.map((d) => ({ value: d.b })),
+                  monthlyRevenueData.map((d) => ({ value: d.c })),
+                )}
+                dataKey="value"
+                cx="50%"
+                cy="50%"
+                innerRadius={15}
+                outerRadius={28}
+                stroke="none"
+              >
+                <Cell fill={colors.seg1} />
+                <Cell fill={colors.seg2} />
+                <Cell fill={colors.seg3} />
+              </Pie>
+            </PieChart>
+          ) : (
+            <BarChart data={monthlyRevenueData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" horizontal={false} strokeOpacity={showGrid ? 1 : 0} />
+              <XAxis type="number" domain={[0, 12000]} ticks={[0, 2000, 4000, 6000, 8000, 10000]}
+                axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }}
+                tickFormatter={(v) => v === 0 ? '0' : `${v / 1000}K`} />
+              <YAxis type="category" dataKey="name" hide />
+              <Bar dataKey="a" stackId="r" fill={colors.seg1} barSize={32} radius={[4, 0, 0, 4]} />
+              <Bar dataKey="b" stackId="r" fill={colors.seg2} barSize={32} />
+              <Bar dataKey="c" stackId="r" fill={colors.seg3} barSize={32} radius={[0, 4, 4, 0]} />
+            </BarChart>
+          )}
         </ResponsiveContainer>
       </div>
       <div className="flex justify-between mt-8 px-2">
         <div>
           <div className="text-[10px] text-[#949494]">CURRENT</div>
-          <div className="text-[15px] font-semibold text-[#585858]">{current}</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{current}K</div>
         </div>
         <div>
           <div className="text-[10px] text-[#949494]">TARGET</div>
-          <div className="text-[15px] font-semibold text-[#585858]">{target}</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{target}K</div>
         </div>
         <div>
           <div className="text-[10px] text-[#949494] flex items-center gap-1">
             <Sparkle />AI POTENTIAL
           </div>
-          <div className="text-[15px] font-semibold text-[#585858]">{potential}</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{potential}K</div>
         </div>
       </div>
     </>
   );
 };
 
+const PipelineChart = () => {
+  const { chartType, colors, showGrid, showValues } = useChartConfig();
+
+  if (chartType === 'funnel') {
+    return <PipelineFunnel data={pipelineData} color={colors.primary} showLabels={showValues} />;
+  }
+
+  if (chartType === 'line') {
+    return (
+      <LineChart data={pipelineData} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" vertical={false} strokeOpacity={showGrid ? 1 : 0} />
+        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#737373', fontSize: 11 }} />
+        <YAxis domain={[0, 20]} ticks={[0, 5, 10, 15, 20]} axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }} />
+        <Line type="monotone" dataKey="value" stroke={colors.primary} strokeWidth={2} dot={{ r: 4 }}>
+          {showValues && <LabelList dataKey="value" position="top" />}
+        </Line>
+      </LineChart>
+    );
+  }
+
+  return (
+    <BarChart data={pipelineData} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
+      <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" vertical={false} strokeOpacity={showGrid ? 1 : 0} />
+      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#737373', fontSize: 11 }} />
+      <YAxis domain={[0, 20]} ticks={[0, 5, 10, 15, 20]} axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }} />
+      <Bar dataKey="value" fill={colors.primary} barSize={48} radius={[4, 4, 0, 0]}>
+        {showValues && <LabelList dataKey="value" position="top" />}
+      </Bar>
+    </BarChart>
+  );
+};
+
 const FounderView = () => {
+  const annualTableData = {
+    columns: ['Metric', 'Value'],
+    rows: [['Current', '62K'], ['Target', '100K'], ['AI Potential', '150K']],
+  };
+
+  const monthlyTableData = {
+    columns: ['Metric', 'Value'],
+    rows: [['Current', '5K'], ['Target', '10K'], ['AI Potential', '12K']],
+  };
+
+  const pipelineTableData = {
+    columns: ['Stage', 'Count'],
+    rows: pipelineData.map((d) => [d.name, d.value]),
+  };
+
   const cards = {
     kpis: (
-      <Card>
+      <Card cardId="founder-kpi-pills">
         <div className="flex items-center gap-8">
           {adminKpis.map((kpi) => (
             <div key={kpi.label} className="flex items-center gap-2">
@@ -124,17 +216,17 @@ const FounderView = () => {
     targets: (
     <div className="grid grid-cols-2 gap-5">
       {/* Annual Revenue Target */}
-      <Card data={[{ name: 'Current', value: 62 }, { name: 'Remaining', value: 38 }]}>
+      <Card cardId="founder-annual-revenue" data={annualTableData}>
         <CardHeader title="Annual Revenue Target" />
         <AnnualRevenueTarget />
         <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
           <span>Improve 30% + lift in calls to conversion</span>
-          <span className="font-semibold cursor-pointer">Check how</span>
+          <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
         </div>
       </Card>
 
       {/* Monthly Revenue Target */}
-      <Card data={monthlyRevenueData.map((d) => ({ name: d.name, value: d.a + d.b + d.c }))}>
+      <Card cardId="founder-monthly-revenue" data={monthlyTableData}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1.5">
             <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
@@ -143,7 +235,7 @@ const FounderView = () => {
             </svg>
           </div>
           <div className="flex items-center gap-3">
-            <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5">
+            <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5 hover:bg-[#f4f6f8] transition-colors duration-150">
               Check how to improve
             </button>
             <DotsIcon />
@@ -154,7 +246,7 @@ const FounderView = () => {
     </div>
     ),
     pipeline: (
-      <Card>
+      <Card cardId="founder-pipeline" data={pipelineTableData}>
         <CardHeader title="Pipeline conversation" />
         <div className="mb-3">
           <span className="bg-[#eaf7e9] text-[#3ca30f] text-[11px] font-medium rounded-full px-3 py-1">
@@ -164,16 +256,7 @@ const FounderView = () => {
         <div className="flex items-center">
           <div className="flex-1" style={{ height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={pipelineData} margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" vertical={false} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#737373', fontSize: 11 }} />
-                <YAxis domain={[0, 20]} ticks={[0, 5, 10, 15, 20]} axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }} />
-                <Bar dataKey="value" fill="#7ed3cf" barSize={48} radius={[4, 4, 0, 0]}>
-                  {pipelineData.map((entry, i) => (
-                    <Cell key={i} fill={entry.name === 'Won' ? '#3ca30f' : '#7ed3cf'} />
-                  ))}
-                </Bar>
-              </BarChart>
+              <PipelineChart />
             </ResponsiveContainer>
           </div>
           <div className="flex flex-col items-center gap-2 pl-6 w-32 shrink-0">
@@ -186,7 +269,7 @@ const FounderView = () => {
       </Card>
     ),
     performers: (
-      <Card>
+      <Card cardId="founder-top-performers">
         <CardHeader title="Top Performers" />
         <PerformersTable data={repPerformanceTable} />
       </Card>

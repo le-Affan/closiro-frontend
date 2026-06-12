@@ -44,11 +44,11 @@ const GenerateReportButton = ({ selectedProfile }) => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="bg-[#7ed3cf] text-white text-[12px] font-medium rounded-lg px-4 py-2 flex items-center gap-1.5"
+        className="bg-[#5bc4bf] hover:bg-[#4aada8] text-white text-[12px] font-medium rounded-md px-4 py-2 flex items-center gap-1.5 transition-colors duration-150"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M12 20h9" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M12 20h9" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         Generate report
       </button>
@@ -119,7 +119,7 @@ const GenerateReportButton = ({ selectedProfile }) => {
           </div>
 
           {toast && (
-            <div className="fixed bottom-6 right-6 bg-[#585858] text-white text-[12px] px-4 py-2 rounded-md shadow-lg z-[9999]">
+            <div className="fixed bottom-6 right-6 bg-[#1a1a1a] text-white text-[13px] px-5 py-3 rounded-lg shadow-lg z-[9999] border-l-[3px] border-l-[#5bc4bf]">
               Downloading...
             </div>
           )}
@@ -158,7 +158,7 @@ const SearchActionButton = ({ query, setQuery }) => {
         placeholder="Search..."
         onKeyDown={(e) => e.key === 'Escape' && handleClose()}
         onBlur={() => setOpen(false)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 outline-none w-32"
+        className="text-[12px] font-medium text-[#585858] border-[1.5px] border-[#e0e0e0] rounded-lg px-3 py-2 outline-none w-32"
       />
     );
   }
@@ -166,11 +166,11 @@ const SearchActionButton = ({ query, setQuery }) => {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
+      className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-md px-4 py-2 flex items-center gap-1.5 hover:bg-[#f4f6f8] transition-colors duration-150"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="11" cy="11" r="7" stroke="#585858" strokeWidth="2" />
-        <path d="M21 21l-4-4" stroke="#585858" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="11" cy="11" r="7" stroke="#585858" strokeWidth="2.5" />
+        <path d="M21 21l-4-4" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" />
       </svg>
       Search
     </button>
@@ -207,10 +207,10 @@ const FiltersActionButton = () => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-md px-4 py-2 flex items-center gap-1.5 hover:bg-[#f4f6f8] transition-colors duration-150"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M4 6h16M8 6v0M4 12h16M14 12v0M4 18h16M10 18v0" stroke="#585858" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M4 6h16M8 6v0M4 12h16M14 12v0M4 18h16M10 18v0" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           <circle cx="8" cy="6" r="2" fill="#585858" />
           <circle cx="14" cy="12" r="2" fill="#585858" />
           <circle cx="10" cy="18" r="2" fill="#585858" />
@@ -259,11 +259,11 @@ const PeriodActionButton = () => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-md px-4 py-2 flex items-center gap-1.5 hover:bg-[#f4f6f8] transition-colors duration-150"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="4" width="18" height="18" rx="2" stroke="#585858" strokeWidth="2" />
-          <path d="M3 9h18M8 2v4M16 2v4" stroke="#585858" strokeWidth="2" strokeLinecap="round" />
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="#585858" strokeWidth="2.5" />
+          <path d="M3 9h18M8 2v4M16 2v4" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
         {label}
       </button>
@@ -333,10 +333,10 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-md px-4 py-2 flex items-center gap-1.5 hover:bg-[#f4f6f8] transition-colors duration-150"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M12 5v14M5 12h14" stroke="#585858" strokeWidth="2" strokeLinecap="round" />
+          <path d="M12 5v14M5 12h14" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
         + Add widget
       </button>
@@ -369,7 +369,7 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
         </div>
       )}
       {toast && (
-        <div className="fixed bottom-6 right-6 bg-[#585858] text-white text-[12px] px-4 py-2 rounded-md shadow-lg z-[9999]">
+        <div className="fixed bottom-6 right-6 bg-[#1a1a1a] text-white text-[13px] px-5 py-3 rounded-lg shadow-lg z-[9999] border-l-[3px] border-l-[#5bc4bf]">
           Widget added
         </div>
       )}
@@ -397,6 +397,7 @@ const PageHeader = ({ selectedProfile }) => {
       {/* Action bar */}
       <div className="flex items-center gap-2">
         <GenerateReportButton selectedProfile={selectedProfile} />
+        <div className="w-px h-5 bg-[#e0e0e0] mx-2" />
         <SearchActionButton query={searchQuery} setQuery={setSearchQuery} />
         <FiltersActionButton />
         <PeriodActionButton />
@@ -404,7 +405,7 @@ const PageHeader = ({ selectedProfile }) => {
       </div>
 
       {searchQuery && (
-        <div className="text-[11px] text-[#737373] bg-[#f5f5f5] inline-block px-2.5 py-1 rounded-md w-fit">
+        <div className="text-[11px] text-[#737373] bg-[#f5f5f5] border border-[#eaeaea] inline-block px-2.5 py-1 rounded-md w-fit">
           Searching for: {searchQuery}
         </div>
       )}

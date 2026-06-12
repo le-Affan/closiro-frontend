@@ -3,11 +3,17 @@ import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend,
 } from 'recharts';
-import { Card, CardHeader, DownArrow, DraggableCard, ChartConfigContext } from './SharedUI';
+import { Card, CardHeader, DownArrow, DraggableCard, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { kpis, trendData, repData, leadSourceData } from '../data/mockData';
 
+const useChartConfig = () => {
+  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const cardId = useContext(CardIdContext);
+  return getConfig(cardId, CHART_DEFAULTS[cardId]);
+};
+
 const CallActivityChart = () => {
-  const { chartType, colors, showLegend, showGrid } = useContext(ChartConfigContext);
+  const { chartType, colors, showLegend, showGrid } = useChartConfig();
   const gridProps = { strokeDasharray: '4 4', stroke: '#eaeaea', vertical: false, strokeOpacity: showGrid ? 1 : 0 };
   const axisProps = {
     x: { dataKey: 'month', axisLine: false, tickLine: false, tick: { fill: '#949494', fontSize: 11 } },
@@ -22,10 +28,10 @@ const CallActivityChart = () => {
         <YAxis {...axisProps.y} />
         <Tooltip />
         {showLegend && <Legend />}
-        <Bar dataKey="connected" fill={colors.primary} />
-        <Bar dataKey="followups" fill="#f9d392" />
-        <Bar dataKey="missed" fill="#de3226" />
-        <Bar dataKey="calls" fill="#2477e8" />
+        <Bar dataKey="connected" fill={colors.connected} />
+        <Bar dataKey="followups" fill={colors.followups} />
+        <Bar dataKey="missed" fill={colors.missed} />
+        <Bar dataKey="calls" fill={colors.total} />
       </BarChart>
     );
   }
@@ -38,10 +44,10 @@ const CallActivityChart = () => {
         <YAxis {...axisProps.y} />
         <Tooltip />
         {showLegend && <Legend />}
-        <Line type="monotone" dataKey="connected" stroke={colors.primary} dot={false} />
-        <Line type="monotone" dataKey="followups" stroke="#f1a013" dot={false} />
-        <Line type="monotone" dataKey="missed" stroke="#de3226" dot={false} />
-        <Line type="monotone" dataKey="calls" stroke="#2477e8" dot={false} />
+        <Line type="monotone" dataKey="connected" stroke={colors.connected} dot={false} />
+        <Line type="monotone" dataKey="followups" stroke={colors.followups} dot={false} />
+        <Line type="monotone" dataKey="missed" stroke={colors.missed} dot={false} />
+        <Line type="monotone" dataKey="calls" stroke={colors.total} dot={false} />
       </LineChart>
     );
   }
@@ -53,18 +59,36 @@ const CallActivityChart = () => {
       <YAxis {...axisProps.y} />
       <Tooltip />
       {showLegend && <Legend />}
-      <Area type="monotone" dataKey="connected" stackId="1" stroke={colors.primary} fill={colors.primary} fillOpacity={0.7} />
-      <Area type="monotone" dataKey="followups" stackId="1" stroke="#f1a013" fill="#f9d392" fillOpacity={0.7} />
-      <Area type="monotone" dataKey="missed" stackId="1" stroke="#de3226" fill="#de3226" fillOpacity={0.5} />
-      <Area type="monotone" dataKey="calls" stackId="1" stroke="#2477e8" fill="#2477e8" fillOpacity={0.5} />
+      <Area type="monotone" dataKey="connected" stackId="1" stroke={colors.connected} fill={colors.connected} fillOpacity={0.7} />
+      <Area type="monotone" dataKey="followups" stackId="1" stroke={colors.followups} fill={colors.followups} fillOpacity={0.7} />
+      <Area type="monotone" dataKey="missed" stackId="1" stroke={colors.missed} fill={colors.missed} fillOpacity={0.5} />
+      <Area type="monotone" dataKey="calls" stackId="1" stroke={colors.total} fill={colors.total} fillOpacity={0.5} />
     </AreaChart>
   );
 };
 
 const ConversionByLeadSourceChart = () => {
-  const { colors, showGrid } = useContext(ChartConfigContext);
+  const { chartType, colors, showGrid, sortOrder } = useChartConfig();
+
+  const sorted = [...leadSourceData].sort((a, b) => (
+    sortOrder === 'alpha' ? a.name.localeCompare(b.name) : b.value - a.value
+  ));
+
+  if (chartType === 'table') {
+    return (
+      <div className="flex flex-col gap-2 w-full">
+        {sorted.map((s) => (
+          <div key={s.name} className="flex items-center justify-between text-[12px] text-[#585858] border-b border-[#f1f1f1] py-1.5">
+            <span>{s.name}</span>
+            <span className="font-semibold">{s.value}%</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <BarChart data={leadSourceData} layout="vertical" margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
+    <BarChart data={sorted} layout="vertical" margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
       <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" horizontal={false} strokeOpacity={showGrid ? 1 : 0} />
       <XAxis type="number" domain={[0, 40]} ticks={[0, 10, 20, 30, 40]}
         axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }}
@@ -72,6 +96,32 @@ const ConversionByLeadSourceChart = () => {
       <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#737373', fontSize: 11 }} width={90} />
       <Bar dataKey="value" fill={colors.primary} barSize={14} radius={[0, 4, 4, 0]} />
     </BarChart>
+  );
+};
+
+const repCategory = (score) => (score >= 70 ? 'good' : score >= 50 ? 'average' : 'bad');
+
+const RepPerformanceList = ({ reps }) => {
+  const { colors, sortOrder, showLabels } = useChartConfig();
+
+  const sorted = [...reps].sort((a, b) => {
+    if (sortOrder === 'alpha') return a.name.localeCompare(b.name);
+    if (sortOrder === 'reverse') return a.score - b.score;
+    return b.score - a.score;
+  });
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      {sorted.map((rep) => (
+        <div key={rep.name} className="flex items-center gap-3">
+          <span className="text-[11px] text-[#737373] w-28 shrink-0">{rep.name}</span>
+          <div className="flex-1 h-1.5 bg-[#f1f1f1] rounded-full overflow-hidden">
+            <div className="h-full rounded-full" style={{ width: `${rep.score}%`, backgroundColor: colors[repCategory(rep.score)] }} />
+          </div>
+          {showLabels && <span className="text-[11px] text-[#949494] w-8 text-right">{rep.score}%</span>}
+        </div>
+      ))}
+    </div>
   );
 };
 
@@ -96,47 +146,56 @@ const ManagerView = () => {
 
   const filteredRepData = repData.filter((rep) => rep.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
+  const trendTableData = {
+    columns: ['Month', 'Total', 'Connected', 'Missed', 'Follow-ups'],
+    rows: trendData.map((d) => [d.month, d.calls, d.connected, d.missed, d.followups]),
+  };
+
+  const repTableData = {
+    columns: ['Name', 'Score', 'Category'],
+    rows: repData.map((r) => [r.name, `${r.score}%`, repCategory(r.score)[0].toUpperCase() + repCategory(r.score).slice(1)]),
+  };
+
+  const leadSourceTableData = {
+    columns: ['Source', 'Conversion %'],
+    rows: leadSourceData.map((s) => [s.name, `${s.value}%`]),
+  };
+
   const cards = {
     trend: (
-      <Card data={trendData.map((d) => ({ name: d.month, value: d.calls }))}>
-        <CardHeader title="Call Activity Trend" />
-        <div className="flex items-center gap-8 mb-4">
-          {kpis.map((kpi) => (
-            <div key={kpi.label} className="flex items-center gap-2">
-              <DownArrow color={kpi.color} />
-              <div>
-                <div className="text-[11px] text-[#949494]">{kpi.label}</div>
-                <div className="text-[15px] font-semibold text-[#585858]">{kpi.value}</div>
+      <>
+        <Card cardId="manager-kpi-pills">
+          <div className="flex items-center gap-8">
+            {kpis.map((kpi) => (
+              <div key={kpi.label} className="flex items-center gap-2">
+                <DownArrow color={kpi.color} />
+                <div>
+                  <div className="text-[11px] text-[#949494]">{kpi.label}</div>
+                  <div className="text-[15px] font-semibold text-[#585858]">{kpi.value}</div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        {period && (
-          <div className="mb-3 text-[11px] text-[#737373] bg-[#f5f5f5] inline-block px-2.5 py-1 rounded-md">
-            Showing data for: {period}
+            ))}
           </div>
-        )}
-        <div className="bg-[#fafafa] rounded-lg p-2" style={{ height: 260 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <CallActivityChart />
-          </ResponsiveContainer>
-        </div>
-      </Card>
+        </Card>
+        <Card cardId="manager-call-trend" data={trendTableData}>
+          <CardHeader title="Call Activity Trend" />
+          {period && (
+            <div className="mb-3 text-[11px] text-[#737373] bg-[#f5f5f5] border border-[#eaeaea] inline-block px-2.5 py-1 rounded-md">
+              Showing data for: {period}
+            </div>
+          )}
+          <div className="bg-[#fafafa] rounded-lg p-2" style={{ height: 260 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <CallActivityChart />
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </>
     ),
     reps: (
-      <Card>
+      <Card cardId="manager-rep-performance" data={repTableData}>
         <CardHeader title="Rep Performance Score" />
-        <div className="flex flex-col gap-2.5">
-          {filteredRepData.map((rep) => (
-            <div key={rep.name} className="flex items-center gap-3">
-              <span className="text-[11px] text-[#737373] w-28 shrink-0">{rep.name}</span>
-              <div className="flex-1 h-1.5 bg-[#f1f1f1] rounded-full overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: `${rep.score}%`, backgroundColor: rep.color }} />
-              </div>
-              <span className="text-[11px] text-[#949494] w-8 text-right">{rep.score}%</span>
-            </div>
-          ))}
-        </div>
+        <RepPerformanceList reps={filteredRepData} />
         <div className="flex items-center gap-6 mt-4 text-[11px] text-[#737373]">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#3ca30f]" /> GOOD <span className="font-semibold text-[#585858]">70%</span>
@@ -150,12 +209,12 @@ const ManagerView = () => {
         </div>
         <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
           <span>Improve 30% + lift in calls to conversion</span>
-          <span className="font-semibold cursor-pointer">Check how</span>
+          <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
         </div>
       </Card>
     ),
     conversion: (
-      <Card data={leadSourceData}>
+      <Card cardId="manager-lead-source" data={leadSourceTableData}>
         <CardHeader title="Conversion Rate by Lead Source" />
         <div style={{ height: 240 }}>
           <ResponsiveContainer width="100%" height="100%">

@@ -4,7 +4,7 @@ const ProfileSwitcher = ({ selectedProfile, setSelectedProfile }) => (
     <select
       value={selectedProfile}
       onChange={(e) => setSelectedProfile(e.target.value)}
-      className="bg-white border border-[#e0e0e0] rounded-lg text-[12px] text-[#585858] px-3 py-1.5 shadow-sm"
+      className="bg-white border border-[#e0e0e0] rounded-md text-[13px] font-medium text-[#585858] px-3 py-1.5 shadow-sm hover:bg-[#f4f6f8] focus:outline-none focus:ring-2 focus:ring-[#7ed3cf] transition-colors duration-150 cursor-pointer"
     >
       <option value="Sales Agent">Sales Agent</option>
       <option value="Sales Manager">Sales Manager</option>
