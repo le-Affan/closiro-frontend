@@ -8,6 +8,8 @@ import AgentView from './components/AgentView';
 import ManagerView from './components/ManagerView';
 import FounderView from './components/FounderView';
 import { ChartConfigRegistryProvider } from './components/SharedUI';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 
 function App() {
   const [selectedProfile, setSelectedProfile] = useState('Sales Manager');

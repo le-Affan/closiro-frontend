@@ -2,6 +2,34 @@ import { useState, useEffect, useRef, useContext, createContext } from 'react';
 import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
 } from 'recharts';
+import { ResponsiveGridLayout, useContainerWidth } from 'react-grid-layout';
+
+// ---------- shared grid layout wrapper ----------
+export const DashboardGrid = ({ layouts, onLayoutChange, children }) => {
+  const { width, containerRef, mounted } = useContainerWidth({ measureBeforeMount: true });
+  return (
+    <div ref={containerRef}>
+      {mounted && (
+      <ResponsiveGridLayout
+        className="layout"
+        width={width}
+        layouts={layouts}
+        breakpoints={{ lg: 0 }}
+        cols={{ lg: 12 }}
+        rowHeight={120}
+        margin={[16, 16]}
+        containerPadding={[20, 20]}
+        draggableHandle=".drag-handle"
+        isResizable
+        resizeHandles={['se']}
+        onLayoutChange={onLayoutChange}
+      >
+        {children}
+      </ResponsiveGridLayout>
+      )}
+    </div>
+  );
+};
 
 // ---------- small UI helpers ----------
 export const DownArrow = ({ color }) => (
@@ -522,7 +550,7 @@ const TITLE_ROW = '[&>*:first-child]:shrink-0 [&>*:first-child]:pb-4 [&>*:first-
 const DEFAULT_EXTRA = `[&>div:first-child]:shrink-0 [&>div:first-child]:!mb-0 [&>div:first-child]:pb-4 [&>div:first-child]:border-b [&>div:first-child]:border-[#e8e8e8] [&>div:last-child]:flex-1 [&>div:last-child]:min-h-0 [&>div:last-child]:!h-auto [&>div:last-child]:flex [&>div:last-child]:flex-col [&>div:last-child]:justify-center [&>div:last-child]:overflow-y-auto ${RECHARTS_FULL}`;
 
 const FULLSCREEN_CONFIG = {
-  'manager-rep-performance': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-center [&_.h-1\\.5]:!h-8 [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
+  'manager-rep-performance': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-center [&_.h-2]:!h-8 [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
   'founder-annual-revenue': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
   'founder-monthly-revenue': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0`,
   'founder-pipeline': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:shrink-0 [&>*:nth-child(3)]:flex-1 [&>*:nth-child(3)]:min-h-0 [&>*:nth-child(3)>*:first-child]:!h-full [&_.rounded-md]:flex-1`,
@@ -662,8 +690,8 @@ export const Card = ({ children, className = '', cardId, data, hasChart, onRemov
     <>
       <CardIdContext.Provider value={cardId}>
         <CardContext.Provider value={ctx}>
-          <div className={`relative group bg-white border border-[#e8e8e8] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-150 p-5 ${className}`} style={config.background ? { backgroundColor: config.background } : undefined}>
-            <div data-drag-handle="true" className="absolute top-2 left-2 text-[#bebebe] hover:text-[#737373] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab select-none">⠿</div>
+          <div className={`relative group bg-white border border-[#e8e8e8] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-150 p-5 h-full overflow-hidden flex flex-col ${className}`} style={config.background ? { backgroundColor: config.background } : undefined}>
+            <div className="drag-handle absolute top-2 left-2 text-[#bebebe] hover:text-[#737373] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing select-none">⠿</div>
             {children}
 
             {toast && (
@@ -695,33 +723,6 @@ export const Card = ({ children, className = '', cardId, data, hasChart, onRemov
         <Card key={id} className={className} cardId={cardId} data={data} hasChart={hasChart}>{children}</Card>
       ))}
     </>
-  );
-};
-
-// ---------- HTML5 drag-and-drop reorder wrapper ----------
-export const DraggableCard = ({ index, onReorder, children, className = '' }) => {
-  const [draggable, setDraggable] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
-
-  return (
-    <div
-      draggable={draggable}
-      onDragStart={(e) => e.dataTransfer.setData('text/plain', String(index))}
-      onDragEnd={() => setDraggable(false)}
-      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-      onDragLeave={() => setDragOver(false)}
-      onDrop={(e) => {
-        e.preventDefault();
-        setDragOver(false);
-        const from = Number(e.dataTransfer.getData('text/plain'));
-        if (from !== index) onReorder(from, index);
-      }}
-      onMouseDown={(e) => { if (e.target.closest('[data-drag-handle]')) setDraggable(true); }}
-      onMouseUp={() => setDraggable(false)}
-      className={`rounded-xl ${dragOver ? 'outline outline-2 outline-dashed outline-[#2477e8]' : ''} ${className}`}
-    >
-      {children}
-    </div>
   );
 };
 
@@ -770,12 +771,12 @@ export const AnimatedProgressBar = ({ label, current, target, pct, color }) => {
 export const FUNNEL_WIDTHS = ['100%', '82%', '64%', '46%', '30%'];
 
 export const PipelineFunnel = ({ data, color = '#7ed3cf', showLabels = true }) => (
-  <div className="flex flex-col items-center gap-2 py-2">
+  <div className="flex flex-col items-center gap-2 h-full overflow-y-auto py-2">
     {data.map((stage, i) => (
       <div
         key={stage.name}
-        className="text-white text-[12px] font-medium rounded-md flex items-center justify-center py-3"
-        style={{ width: FUNNEL_WIDTHS[i], backgroundColor: color }}
+        className="text-white text-[12px] font-medium rounded-md flex items-center justify-center flex-1 w-full"
+        style={{ maxWidth: FUNNEL_WIDTHS[i], backgroundColor: color }}
       >
         {showLabels ? `${stage.name} — ${stage.value}` : ' '}
       </div>

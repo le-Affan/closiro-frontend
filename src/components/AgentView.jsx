@@ -3,8 +3,19 @@ import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
-import { Card, CardHeader, RadialGauge, AnimatedProgressBar, PipelineFunnel, DraggableCard, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
+import { Card, CardHeader, RadialGauge, AnimatedProgressBar, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { agentStats, personalTargets, myPipelineData } from '../data/mockData';
+
+const LAYOUT_KEY = 'closira-layout-agent';
+
+const DEFAULT_LAYOUTS = {
+  lg: [
+    { i: 'agent-stats-row', x: 0, y: 0, w: 12, h: 2 },
+    { i: 'agent-targets', x: 0, y: 2, w: 12, h: 2 },
+    { i: 'agent-pipeline', x: 0, y: 4, w: 6, h: 4 },
+    { i: 'agent-performance', x: 6, y: 4, w: 6, h: 4 },
+  ],
+};
 
 const useChartConfig = () => {
   const { getConfig } = useContext(ChartConfigRegistryContext);
@@ -37,7 +48,7 @@ const MyPipelineChart = () => {
 
   if (chartType === 'bar') {
     return (
-      <div style={{ height: 200 }}>
+      <div className="h-full flex flex-col">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={myPipelineData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" vertical={false} />
@@ -69,37 +80,47 @@ const AgentView = () => {
   };
 
   const cards = {
-    stats: (
+    'agent-stats-row': (
       <Card cardId="agent-stats-row">
         <CardHeader title="My Stats" />
-        <div className="flex items-center justify-around">
+        <div className="flex-1 min-h-0 overflow-hidden flex items-center justify-around">
           {agentStats.map((s) => (
             <RadialGauge key={s.label} pct={s.pct} display={s.display} label={s.label} color={statsColor} />
           ))}
         </div>
       </Card>
     ),
-    targets: (
+    'agent-targets': (
       <Card cardId="agent-targets">
         <CardHeader title="Personal Targets" />
-        <div className="flex flex-col gap-4">
-          {personalTargets.map((t) => (
-            <AnimatedProgressBar key={t.label} label={t.label} current={t.current} target={t.target} pct={t.pct} color={targetsColor} />
-          ))}
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex flex-col gap-4 h-full overflow-y-auto">
+            {personalTargets.map((t) => (
+              <div
+                key={t.label}
+                className="flex items-center"
+                style={{ height: `calc((100% - ${(personalTargets.length - 1) * 16}px) / ${personalTargets.length})` }}
+              >
+                <AnimatedProgressBar label={t.label} current={t.current} target={t.target} pct={t.pct} color={targetsColor} />
+              </div>
+            ))}
+          </div>
         </div>
       </Card>
     ),
-    pipeline: (
+    'agent-pipeline': (
       <Card cardId="agent-pipeline" data={pipelineTableData}>
         <CardHeader title="My Pipeline" />
-        <MyPipelineChart />
-        <div className="mt-2 text-center text-[12px] font-semibold text-[#3ca30f]">12% Conversion to Won</div>
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <MyPipelineChart />
+        </div>
+        <div className="mt-2 text-center text-[12px] font-semibold text-[#3ca30f] shrink-0">12% Conversion to Won</div>
       </Card>
     ),
-    performance: (
+    'agent-performance': (
       <Card cardId="agent-performance" data={performanceTableData}>
         <CardHeader title="My Performance" />
-        <div className="flex flex-col items-center gap-2 py-2">
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col items-center justify-center gap-2 py-2">
           <div className="relative" style={{ width: 180, height: 180 }}>
             <ResponsiveContainer width="100%" height="100%">
               <MyPerformanceGauge />
@@ -112,13 +133,20 @@ const AgentView = () => {
     ),
   };
 
-  const [cardOrder, setCardOrder] = useState(['stats', 'targets', 'pipeline', 'performance']);
+  const [layouts, setLayouts] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LAYOUT_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // ignore malformed storage
+    }
+    return DEFAULT_LAYOUTS;
+  });
 
-  const handleReorder = (from, to) => {
-    setCardOrder((order) => {
-      const next = [...order];
-      const [moved] = next.splice(from, 1);
-      next.splice(to, 0, moved);
+  const updateLayouts = (update) => {
+    setLayouts((prev) => {
+      const next = typeof update === 'function' ? update(prev) : update;
+      localStorage.setItem(LAYOUT_KEY, JSON.stringify(next));
       return next;
     });
   };
@@ -128,8 +156,12 @@ const AgentView = () => {
   useEffect(() => {
     const handler = (e) => {
       const id = Date.now();
+      const widgetId = `added-widget-${id}`;
       setAddedWidgets((prev) => [...prev, { name: e.detail.name, type: e.detail.type, id }]);
-      setCardOrder((order) => [...order, `added-widget-${id}`]);
+      updateLayouts((prev) => ({
+        ...prev,
+        lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
+      }));
     };
     window.addEventListener('addWidget', handler);
     return () => window.removeEventListener('addWidget', handler);
@@ -141,7 +173,7 @@ const AgentView = () => {
     widgetCards[widgetId] = (
       <Card cardId={widgetId} onRemove={() => {
         setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
-        setCardOrder((order) => order.filter((id) => id !== widgetId));
+        updateLayouts((prev) => ({ ...prev, lg: prev.lg.filter((l) => l.i !== widgetId) }));
       }}>
         <CardHeader title={w.name} />
         <p className="text-[12px] text-[#949494]">Widget type: {w.type}</p>
@@ -152,13 +184,11 @@ const AgentView = () => {
   const allCards = { ...cards, ...widgetCards };
 
   return (
-    <>
-      {cardOrder.map((id, index) => (
-        <DraggableCard key={id} index={index} onReorder={handleReorder}>
-          {allCards[id]}
-        </DraggableCard>
+    <DashboardGrid layouts={layouts} onLayoutChange={(_, all) => updateLayouts(all)}>
+      {Object.keys(allCards).map((id) => (
+        <div key={id}>{allCards[id]}</div>
       ))}
-    </>
+    </DashboardGrid>
   );
 };
 

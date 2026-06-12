@@ -3,8 +3,20 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
   XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList,
 } from 'recharts';
-import { Card, CardHeader, ConnectedCardMenu, DownArrow, Sparkle, PerformersTable, PipelineFunnel, DraggableCard, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
+import { Card, CardHeader, ConnectedCardMenu, DownArrow, Sparkle, PerformersTable, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { adminKpis, pipelineData, monthlyRevenueData, repPerformanceTable } from '../data/mockData';
+
+const LAYOUT_KEY = 'closira-layout-founder';
+
+const DEFAULT_LAYOUTS = {
+  lg: [
+    { i: 'founder-kpi-pills', x: 0, y: 0, w: 12, h: 1 },
+    { i: 'founder-annual-revenue', x: 0, y: 1, w: 6, h: 4 },
+    { i: 'founder-monthly-revenue', x: 6, y: 1, w: 6, h: 4 },
+    { i: 'founder-pipeline', x: 0, y: 5, w: 12, h: 4 },
+    { i: 'founder-top-performers', x: 0, y: 9, w: 12, h: 3 },
+  ],
+};
 
 const useChartConfig = () => {
   const { getConfig } = useContext(ChartConfigRegistryContext);
@@ -207,18 +219,8 @@ const FounderView = () => {
     rows: pipelineData.map((d) => [d.name, d.value]),
   };
 
-  const [targetsOrder, setTargetsOrder] = useState([0, 1]);
-  const handleTargetsReorder = (from, to) => {
-    setTargetsOrder((order) => {
-      const next = [...order];
-      const [moved] = next.splice(from, 1);
-      next.splice(to, 0, moved);
-      return next;
-    });
-  };
-
   const cards = {
-    kpis: (
+    'founder-kpi-pills': (
       <Card cardId="founder-kpi-pills">
         <div className="flex items-center gap-8">
           {adminKpis.map((kpi) => (
@@ -233,43 +235,36 @@ const FounderView = () => {
         </div>
       </Card>
     ),
-    targets: (
-    <div className="flex gap-6">
-      {targetsOrder.map((cardKey, index) => (
-        <DraggableCard key={cardKey} index={index} onReorder={handleTargetsReorder} className="flex-1">
-          {cardKey === 0 ? (
-            <Card cardId="founder-annual-revenue" data={annualTableData} hasChart>
-              <CardHeader title="Annual Revenue Target" />
-              <AnnualRevenueTarget />
-              <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
-                <span>Improve 30% + lift in calls to conversion</span>
-                <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
-              </div>
-            </Card>
-          ) : (
-            <Card cardId="founder-monthly-revenue" data={monthlyTableData} hasChart>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-1.5">
-                  <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5 hover:bg-[#f4f6f8] transition-colors duration-150">
-                    Check how to improve
-                  </button>
-                  <ConnectedCardMenu />
-                </div>
-              </div>
-              <MonthlyRevenueTarget />
-            </Card>
-          )}
-        </DraggableCard>
-      ))}
-    </div>
+    'founder-annual-revenue': (
+      <Card cardId="founder-annual-revenue" data={annualTableData} hasChart>
+        <CardHeader title="Annual Revenue Target" />
+        <AnnualRevenueTarget />
+        <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
+          <span>Improve 30% + lift in calls to conversion</span>
+          <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
+        </div>
+      </Card>
     ),
-    pipeline: (
+    'founder-monthly-revenue': (
+      <Card cardId="founder-monthly-revenue" data={monthlyTableData} hasChart>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-1.5">
+            <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5 hover:bg-[#f4f6f8] transition-colors duration-150">
+              Check how to improve
+            </button>
+            <ConnectedCardMenu />
+          </div>
+        </div>
+        <MonthlyRevenueTarget />
+      </Card>
+    ),
+    'founder-pipeline': (
       <Card cardId="founder-pipeline" data={pipelineTableData}>
         <CardHeader title="Pipeline conversation" />
         <div className="mb-3">
@@ -277,8 +272,8 @@ const FounderView = () => {
             AI projects 28% conversion by Q3
           </span>
         </div>
-        <div className="flex items-center">
-          <div className="flex-1" style={{ height: 240 }}>
+        <div className="flex items-stretch flex-1 min-h-0">
+          <div className="flex-1 h-full flex flex-col">
             <ResponsiveContainer width="100%" height="100%">
               <PipelineChart />
             </ResponsiveContainer>
@@ -292,21 +287,30 @@ const FounderView = () => {
         </div>
       </Card>
     ),
-    performers: (
+    'founder-top-performers': (
       <Card cardId="founder-top-performers">
         <CardHeader title="Top Performers" />
-        <PerformersTable data={repPerformanceTable} color={performersColor} />
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <PerformersTable data={repPerformanceTable} color={performersColor} />
+        </div>
       </Card>
     ),
   };
 
-  const [cardOrder, setCardOrder] = useState(['kpis', 'targets', 'pipeline', 'performers']);
+  const [layouts, setLayouts] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LAYOUT_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // ignore malformed storage
+    }
+    return DEFAULT_LAYOUTS;
+  });
 
-  const handleReorder = (from, to) => {
-    setCardOrder((order) => {
-      const next = [...order];
-      const [moved] = next.splice(from, 1);
-      next.splice(to, 0, moved);
+  const updateLayouts = (update) => {
+    setLayouts((prev) => {
+      const next = typeof update === 'function' ? update(prev) : update;
+      localStorage.setItem(LAYOUT_KEY, JSON.stringify(next));
       return next;
     });
   };
@@ -316,8 +320,12 @@ const FounderView = () => {
   useEffect(() => {
     const handler = (e) => {
       const id = Date.now();
+      const widgetId = `added-widget-${id}`;
       setAddedWidgets((prev) => [...prev, { name: e.detail.name, type: e.detail.type, id }]);
-      setCardOrder((order) => [...order, `added-widget-${id}`]);
+      updateLayouts((prev) => ({
+        ...prev,
+        lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
+      }));
     };
     window.addEventListener('addWidget', handler);
     return () => window.removeEventListener('addWidget', handler);
@@ -329,7 +337,7 @@ const FounderView = () => {
     widgetCards[widgetId] = (
       <Card cardId={widgetId} onRemove={() => {
         setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
-        setCardOrder((order) => order.filter((id) => id !== widgetId));
+        updateLayouts((prev) => ({ ...prev, lg: prev.lg.filter((l) => l.i !== widgetId) }));
       }}>
         <CardHeader title={w.name} />
         <p className="text-[12px] text-[#949494]">Widget type: {w.type}</p>
@@ -340,13 +348,11 @@ const FounderView = () => {
   const allCards = { ...cards, ...widgetCards };
 
   return (
-    <>
-      {cardOrder.map((id, index) => (
-        <DraggableCard key={id} index={index} onReorder={handleReorder}>
-          {allCards[id]}
-        </DraggableCard>
+    <DashboardGrid layouts={layouts} onLayoutChange={(_, all) => updateLayouts(all)}>
+      {Object.keys(allCards).map((id) => (
+        <div key={id}>{allCards[id]}</div>
       ))}
-    </>
+    </DashboardGrid>
   );
 };
 
