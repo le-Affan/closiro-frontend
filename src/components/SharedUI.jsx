@@ -761,7 +761,7 @@ export const RadialGauge = ({ pct, display, label, size = 88, color }) => (
       <ResponsiveContainer width="100%" height="100%">
         <RadialBarChart data={[{ value: Math.min(pct, 100) }]} startAngle={90} endAngle={-270} innerRadius="65%" outerRadius="85%" barSize={8}>
           <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
-          <RadialBar dataKey="value" cornerRadius={8} fill={color || '#7ed3cf'} background={{ fill: '#f1f1f1' }} />
+          <RadialBar dataKey="value" cornerRadius={8} minAngle={0} clockWise background={{ fill: '#f0f0f0' }} fill={color || '#7ed3cf'} />
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="absolute inset-0 flex items-center justify-center text-[13px] font-semibold text-[#585858] text-center px-1 stat-number" style={color ? { color } : undefined}>

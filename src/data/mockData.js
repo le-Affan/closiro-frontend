@@ -58,7 +58,7 @@ export const kpis = [
 // ---------- profile-scoped mock data (Sales Agent) ----------
 export const agentStats = [
   { label: 'Calls Today', display: '21 / 25', pct: 84 },
-  { label: 'Conversion Rate', display: '14% / 18%', pct: 78 },
+  { label: 'Conversion Rate', display: '14%', pct: 78 },
   { label: 'Pipeline Deals', display: '4', pct: 40 },
   { label: 'Rank', display: '#2 of 8', pct: 88 },
 ];
