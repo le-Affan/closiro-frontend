@@ -170,15 +170,149 @@ export const CardHeader = ({ title }) => {
 
 const ACCORDION_ROWS = ['Chart type', 'Actual Value', 'Target Value', 'Potential Value', 'Colors', 'Visual Settings', 'Data'];
 
-const AccordionRow = ({ label }) => {
-  const [open, setOpen] = useState(false);
+export const DEFAULT_CHART_CONFIG = {
+  chartType: 'default',
+  colors: { primary: '#7ed3cf', secondary: '#3ca30f', tertiary: '#2477e8' },
+  showLegend: true,
+  showGrid: true,
+  actualValue: null,
+  targetValue: null,
+  potentialValue: null,
+};
+
+export const ChartConfigContext = createContext(DEFAULT_CHART_CONFIG);
+
+const COLOR_SWATCHES = ['#7ed3cf', '#3ca30f', '#2477e8', '#f1a013', '#de3226'];
+
+const ToggleSwitch = ({ label, checked, onChange }) => (
+  <label className="flex items-center justify-between text-[12px] text-[#585858] cursor-pointer">
+    {label}
+    <span
+      onClick={() => onChange(!checked)}
+      className={`relative inline-block w-8 h-4.5 rounded-full transition-colors ${checked ? 'bg-[#7ed3cf]' : 'bg-[#e0e0e0]'}`}
+      style={{ width: 32, height: 18 }}
+    >
+      <span
+        className="absolute top-0.5 left-0.5 bg-white rounded-full transition-transform"
+        style={{ width: 14, height: 14, transform: checked ? 'translateX(14px)' : 'translateX(0)' }}
+      />
+    </span>
+  </label>
+);
+
+const AccordionRow = ({ label, open, onToggle, config, updateConfig, data }) => {
+  let content = null;
+
+  switch (label) {
+    case 'Chart type':
+      content = (
+        <div className="flex gap-2">
+          {['area', 'bar', 'line'].map((t) => (
+            <button
+              key={t}
+              onClick={() => updateConfig({ chartType: t })}
+              className={`text-[11px] px-3 py-1.5 rounded-md border ${config.chartType === t ? 'bg-[#7ed3cf] text-white border-[#7ed3cf]' : 'border-[#e0e0e0] text-[#585858]'}`}
+            >
+              {t[0].toUpperCase() + t.slice(1)}
+            </button>
+          ))}
+        </div>
+      );
+      break;
+    case 'Actual Value':
+      content = (
+        <input
+          type="number"
+          value={config.actualValue ?? ''}
+          onChange={(e) => updateConfig({ actualValue: e.target.value })}
+          placeholder="Enter value"
+          className="w-full text-[12px] text-[#585858] border border-[#e0e0e0] rounded-md px-2 py-1.5 outline-none"
+        />
+      );
+      break;
+    case 'Target Value':
+      content = (
+        <input
+          type="number"
+          value={config.targetValue ?? ''}
+          onChange={(e) => updateConfig({ targetValue: e.target.value })}
+          placeholder="Enter value"
+          className="w-full text-[12px] text-[#585858] border border-[#e0e0e0] rounded-md px-2 py-1.5 outline-none"
+        />
+      );
+      break;
+    case 'Potential Value':
+      content = (
+        <input
+          type="number"
+          value={config.potentialValue ?? ''}
+          onChange={(e) => updateConfig({ potentialValue: e.target.value })}
+          placeholder="Enter value"
+          className="w-full text-[12px] text-[#585858] border border-[#e0e0e0] rounded-md px-2 py-1.5 outline-none"
+        />
+      );
+      break;
+    case 'Colors':
+      content = (
+        <div className="flex gap-2">
+          {COLOR_SWATCHES.map((c) => (
+            <button
+              key={c}
+              onClick={() => updateConfig({ colors: { ...config.colors, primary: c } })}
+              className="w-6 h-6 rounded-full border-2"
+              style={{ backgroundColor: c, borderColor: config.colors.primary === c ? '#585858' : 'transparent' }}
+            />
+          ))}
+        </div>
+      );
+      break;
+    case 'Visual Settings':
+      content = (
+        <div className="flex flex-col gap-3">
+          <ToggleSwitch label="Show Legend" checked={config.showLegend} onChange={(v) => updateConfig({ showLegend: v })} />
+          <ToggleSwitch label="Show Grid Lines" checked={config.showGrid} onChange={(v) => updateConfig({ showGrid: v })} />
+        </div>
+      );
+      break;
+    case 'Data': {
+      if (!data || !data.length) {
+        content = <div className="text-[11px] text-[#949494]">No data available</div>;
+        break;
+      }
+      const total = data.reduce((s, d) => s + (Number(d.value) || 0), 0);
+      content = (
+        <table className="w-full text-[11px]">
+          <thead>
+            <tr className="text-left text-[#949494]">
+              <th className="py-1 font-medium">Label</th>
+              <th className="py-1 font-medium">Value</th>
+              <th className="py-1 font-medium">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((d, i) => (
+              <tr key={d.name ?? d.label ?? i}>
+                <td className="py-1 text-[#585858]">{d.name ?? d.label}</td>
+                <td className="py-1 text-[#585858]">{d.value}</td>
+                <td className="py-1 text-[#585858]">{total ? `${((Number(d.value) / total) * 100).toFixed(0)}%` : '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+      break;
+    }
+    default:
+      content = <div className="text-[11px] text-[#949494]">No options yet.</div>;
+  }
+
   return (
     <div className="border-b border-[#e0e0e0]">
-      <button onClick={() => setOpen((o) => !o)} className="w-full flex items-center justify-between py-2.5 text-[12px] font-medium text-[#585858]">
+      <button onClick={onToggle} className="w-full flex items-center justify-between py-2.5 text-[12px] font-medium text-[#585858]">
         {label}
         <ChevronDown open={open} />
       </button>
-      {open && <div className="pb-2.5 text-[11px] text-[#949494]">No options yet.</div>}
+      {open && <div className="pb-3">{content}</div>}
     </div>
   );
 };
@@ -192,32 +326,55 @@ const elementHasChart = (node) => {
 
 const hasChart = (children) => Children.toArray(children).some(elementHasChart);
 
-const FullscreenModal = ({ mode, statOnly, onClose, children }) => (
-  <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-    <div className="relative bg-white rounded-lg shadow-lg w-[90vw] max-w-[1200px] h-[80vh] flex flex-row overflow-hidden">
-      <button onClick={onClose} className="absolute top-3 right-3 text-[#949494] hover:text-[#585858] text-[16px] leading-none z-10">✕</button>
-      <div className="flex-1 p-8 overflow-auto flex items-center justify-center">
-        {statOnly ? (
-          <div className="[&_.stat-number]:text-3xl [&_.stat-label]:text-sm p-12 flex items-center justify-center w-full">
-            {children}
-          </div>
-        ) : (
-          <div style={{ height: 500, width: '100%' }}>
-            {children}
+const FullscreenModal = ({ mode, statOnly, chartIsPresent, data, onClose, children }) => {
+  const [chartConfig, setChartConfig] = useState(DEFAULT_CHART_CONFIG);
+  const [openRow, setOpenRow] = useState(null);
+
+  const updateConfig = (patch) => setChartConfig((c) => ({ ...c, ...patch }));
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+      <div className="relative bg-white rounded-lg shadow-lg w-[90vw] max-w-[1200px] h-[80vh] flex flex-row overflow-hidden">
+        <button onClick={onClose} className="absolute top-3 right-3 text-[#949494] hover:text-[#585858] text-[16px] leading-none z-10">✕</button>
+        <div className="flex-1 p-8 overflow-auto flex items-center justify-center">
+          {statOnly ? (
+            <div className="[&_.stat-number]:text-3xl [&_.stat-label]:text-sm p-12 flex items-center justify-center w-full">
+              {children}
+            </div>
+          ) : (
+            <div style={{ height: 500, width: '100%' }}>
+              <ChartConfigContext.Provider value={chartConfig}>
+                {children}
+              </ChartConfigContext.Provider>
+            </div>
+          )}
+        </div>
+        {mode === 'settings' && (
+          <div className="w-[320px] border-l border-[#e0e0e0] p-5 overflow-auto shrink-0">
+            <h4 className="text-[13px] font-semibold text-[#585858] mb-3">Widget settings</h4>
+            {chartIsPresent ? (
+              ACCORDION_ROWS.map((row) => (
+                <AccordionRow
+                  key={row}
+                  label={row}
+                  open={openRow === row}
+                  onToggle={() => setOpenRow((r) => (r === row ? null : row))}
+                  config={chartConfig}
+                  updateConfig={updateConfig}
+                  data={data}
+                />
+              ))
+            ) : (
+              <div className="text-[12px] text-[#949494]">No chart settings available</div>
+            )}
           </div>
         )}
       </div>
-      {mode === 'settings' && !statOnly && (
-        <div className="w-[320px] border-l border-[#e0e0e0] p-5 overflow-auto shrink-0">
-          <h4 className="text-[13px] font-semibold text-[#585858] mb-3">Widget settings</h4>
-          {ACCORDION_ROWS.map((row) => <AccordionRow key={row} label={row} />)}
-        </div>
-      )}
     </div>
-  </div>
-);
+  );
+};
 
-export const Card = ({ children, className = '' }) => {
+export const Card = ({ children, className = '', data }) => {
   const [modalMode, setModalMode] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [removed, setRemoved] = useState(false);
@@ -263,7 +420,7 @@ export const Card = ({ children, className = '' }) => {
           )}
 
           {modalMode && (
-            <FullscreenModal mode={modalMode} statOnly={!hasChart(children)} onClose={() => setModalMode(null)}>
+            <FullscreenModal mode={modalMode} statOnly={!hasChart(children)} chartIsPresent={hasChart(children)} data={data} onClose={() => setModalMode(null)}>
               {children}
             </FullscreenModal>
           )}
@@ -312,22 +469,25 @@ export const Sparkle = () => (
 );
 
 // ---------- Sales Agent visualisation helpers ----------
-export const RadialGauge = ({ pct, display, label, size = 88 }) => (
-  <div className="flex flex-col items-center gap-2">
-    <div className="relative" style={{ width: size, height: size }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <RadialBarChart data={[{ value: pct }]} startAngle={90} endAngle={-270} innerRadius="75%" outerRadius="100%" barSize={8}>
-          <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
-          <RadialBar dataKey="value" cornerRadius={8} fill="#7ed3cf" background={{ fill: '#f1f1f1' }} />
-        </RadialBarChart>
-      </ResponsiveContainer>
-      <div className="absolute inset-0 flex items-center justify-center text-[13px] font-semibold text-[#585858] text-center px-1">
-        {display}
+export const RadialGauge = ({ pct, display, label, size = 88 }) => {
+  const { colors } = useContext(ChartConfigContext);
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative" style={{ width: size, height: size }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RadialBarChart data={[{ value: pct }]} startAngle={90} endAngle={-270} innerRadius="75%" outerRadius="100%" barSize={8}>
+            <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
+            <RadialBar dataKey="value" cornerRadius={8} fill={colors.primary} background={{ fill: '#f1f1f1' }} />
+          </RadialBarChart>
+        </ResponsiveContainer>
+        <div className="absolute inset-0 flex items-center justify-center text-[13px] font-semibold text-[#585858] text-center px-1">
+          {display}
+        </div>
       </div>
+      <span className="text-[11px] text-[#949494]">{label}</span>
     </div>
-    <span className="text-[11px] text-[#949494]">{label}</span>
-  </div>
-);
+  );
+};
 
 export const AnimatedProgressBar = ({ label, current, target, pct }) => {
   const [width, setWidth] = useState(0);

@@ -1,14 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
 } from 'recharts';
-import { Card, CardHeader, RadialGauge, AnimatedProgressBar, PipelineFunnel, DraggableCard } from './SharedUI';
+import { Card, CardHeader, RadialGauge, AnimatedProgressBar, PipelineFunnel, DraggableCard, ChartConfigContext } from './SharedUI';
 import { agentStats, personalTargets, myPipelineData } from '../data/mockData';
+
+const MyPerformanceGauge = () => {
+  const { colors } = useContext(ChartConfigContext);
+  return (
+    <RadialBarChart data={[{ value: 80 }]} startAngle={90} endAngle={-270} innerRadius="75%" outerRadius="100%" barSize={14}>
+      <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
+      <RadialBar dataKey="value" cornerRadius={10} fill={colors.primary} background={{ fill: '#f1f1f1' }} />
+    </RadialBarChart>
+  );
+};
 
 const AgentView = () => {
   const cards = {
     stats: (
-      <Card>
+      <Card data={agentStats.map((s) => ({ name: s.label, value: s.pct }))}>
         <CardHeader title="My Stats" />
         <div className="flex items-center justify-around">
           {agentStats.map((s) => (
@@ -35,15 +45,12 @@ const AgentView = () => {
       </Card>
     ),
     performance: (
-      <Card>
+      <Card data={[{ name: 'Team Rank #2', value: 80 }]}>
         <CardHeader title="My Performance" />
         <div className="flex flex-col items-center gap-2 py-2">
           <div className="relative" style={{ width: 180, height: 180 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <RadialBarChart data={[{ value: 80 }]} startAngle={90} endAngle={-270} innerRadius="75%" outerRadius="100%" barSize={14}>
-                <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
-                <RadialBar dataKey="value" cornerRadius={10} fill="#7ed3cf" background={{ fill: '#f1f1f1' }} />
-              </RadialBarChart>
+              <MyPerformanceGauge />
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-[28px] font-semibold text-[#585858]">80%</span>

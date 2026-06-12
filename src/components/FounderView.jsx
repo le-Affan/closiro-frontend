@@ -1,10 +1,108 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
   BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, ResponsiveContainer,
 } from 'recharts';
-import { Card, CardHeader, DownArrow, DotsIcon, Sparkle, PerformersTable, DraggableCard } from './SharedUI';
+import { Card, CardHeader, DownArrow, DotsIcon, Sparkle, PerformersTable, DraggableCard, ChartConfigContext } from './SharedUI';
 import { adminKpis, pipelineData, monthlyRevenueData, repPerformanceTable } from '../data/mockData';
+
+const AnnualRevenueTarget = () => {
+  const { colors, actualValue, targetValue, potentialValue } = useContext(ChartConfigContext);
+  const current = actualValue ?? '62K';
+  const target = targetValue ?? '100K';
+  const potential = potentialValue ?? '150K';
+
+  return (
+    <>
+      <div style={{ height: 180 }} className="relative">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={[{ value: 62 }, { value: 38 }]}
+              dataKey="value"
+              cx="50%"
+              cy="100%"
+              startAngle={180}
+              endAngle={0}
+              innerRadius={75}
+              outerRadius={110}
+              stroke="none"
+            >
+              <Cell fill={colors.primary} />
+              <Cell fill="#dbf2f0" />
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        <div className="absolute bottom-1 left-0 right-0 flex justify-between px-4 text-[10px] text-[#949494]">
+          <span>0</span>
+          <span>10K</span>
+          <span>20K</span>
+          <span>40K</span>
+          <span>60K</span>
+          <span>80K</span>
+        </div>
+      </div>
+      <div className="flex justify-between mt-4 px-2">
+        <div>
+          <div className="text-[10px] text-[#949494]">CURRENT</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{current}</div>
+        </div>
+        <div>
+          <div className="text-[10px] text-[#949494]">TARGET</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{target}</div>
+        </div>
+        <div>
+          <div className="text-[10px] text-[#949494] flex items-center gap-1">
+            <Sparkle />AI POTENTIAL
+          </div>
+          <div className="text-[15px] font-semibold text-[#585858]">{potential}</div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const MonthlyRevenueTarget = () => {
+  const { colors, showGrid, actualValue, targetValue, potentialValue } = useContext(ChartConfigContext);
+  const current = actualValue ?? '5K';
+  const target = targetValue ?? '10K';
+  const potential = potentialValue ?? '12K';
+
+  return (
+    <>
+      <div style={{ height: 60 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={monthlyRevenueData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" horizontal={false} strokeOpacity={showGrid ? 1 : 0} />
+            <XAxis type="number" domain={[0, 12000]} ticks={[0, 2000, 4000, 6000, 8000, 10000]}
+              axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }}
+              tickFormatter={(v) => v === 0 ? '0' : `${v / 1000}K`} />
+            <YAxis type="category" dataKey="name" hide />
+            <Bar dataKey="a" stackId="r" fill={colors.primary} barSize={32} radius={[4, 0, 0, 4]} />
+            <Bar dataKey="b" stackId="r" fill="#80cc60" barSize={32} />
+            <Bar dataKey="c" stackId="r" fill="#cdeec1" barSize={32} radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="flex justify-between mt-8 px-2">
+        <div>
+          <div className="text-[10px] text-[#949494]">CURRENT</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{current}</div>
+        </div>
+        <div>
+          <div className="text-[10px] text-[#949494]">TARGET</div>
+          <div className="text-[15px] font-semibold text-[#585858]">{target}</div>
+        </div>
+        <div>
+          <div className="text-[10px] text-[#949494] flex items-center gap-1">
+            <Sparkle />AI POTENTIAL
+          </div>
+          <div className="text-[15px] font-semibold text-[#585858]">{potential}</div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 const FounderView = () => {
   const cards = {
@@ -26,52 +124,9 @@ const FounderView = () => {
     targets: (
     <div className="grid grid-cols-2 gap-5">
       {/* Annual Revenue Target */}
-      <Card>
+      <Card data={[{ name: 'Current', value: 62 }, { name: 'Remaining', value: 38 }]}>
         <CardHeader title="Annual Revenue Target" />
-        <div style={{ height: 180 }} className="relative">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={[{ value: 62 }, { value: 38 }]}
-                dataKey="value"
-                cx="50%"
-                cy="100%"
-                startAngle={180}
-                endAngle={0}
-                innerRadius={75}
-                outerRadius={110}
-                stroke="none"
-              >
-                <Cell fill="#62a5a2" />
-                <Cell fill="#dbf2f0" />
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="absolute bottom-1 left-0 right-0 flex justify-between px-4 text-[10px] text-[#949494]">
-            <span>0</span>
-            <span>10K</span>
-            <span>20K</span>
-            <span>40K</span>
-            <span>60K</span>
-            <span>80K</span>
-          </div>
-        </div>
-        <div className="flex justify-between mt-4 px-2">
-          <div>
-            <div className="text-[10px] text-[#949494]">CURRENT</div>
-            <div className="text-[15px] font-semibold text-[#585858]">62K</div>
-          </div>
-          <div>
-            <div className="text-[10px] text-[#949494]">TARGET</div>
-            <div className="text-[15px] font-semibold text-[#585858]">100K</div>
-          </div>
-          <div>
-            <div className="text-[10px] text-[#949494] flex items-center gap-1">
-              <Sparkle />AI POTENTIAL
-            </div>
-            <div className="text-[15px] font-semibold text-[#585858]">150K</div>
-          </div>
-        </div>
+        <AnnualRevenueTarget />
         <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
           <span>Improve 30% + lift in calls to conversion</span>
           <span className="font-semibold cursor-pointer">Check how</span>
@@ -79,7 +134,7 @@ const FounderView = () => {
       </Card>
 
       {/* Monthly Revenue Target */}
-      <Card>
+      <Card data={monthlyRevenueData.map((d) => ({ name: d.name, value: d.a + d.b + d.c }))}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1.5">
             <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
@@ -94,36 +149,7 @@ const FounderView = () => {
             <DotsIcon />
           </div>
         </div>
-        <div style={{ height: 60 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyRevenueData} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="4 4" stroke="#eaeaea" horizontal={false} />
-              <XAxis type="number" domain={[0, 12000]} ticks={[0, 2000, 4000, 6000, 8000, 10000]}
-                axisLine={false} tickLine={false} tick={{ fill: '#949494', fontSize: 11 }}
-                tickFormatter={(v) => v === 0 ? '0' : `${v / 1000}K`} />
-              <YAxis type="category" dataKey="name" hide />
-              <Bar dataKey="a" stackId="r" fill="#3ca30f" barSize={32} radius={[4, 0, 0, 4]} />
-              <Bar dataKey="b" stackId="r" fill="#80cc60" barSize={32} />
-              <Bar dataKey="c" stackId="r" fill="#cdeec1" barSize={32} radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="flex justify-between mt-8 px-2">
-          <div>
-            <div className="text-[10px] text-[#949494]">CURRENT</div>
-            <div className="text-[15px] font-semibold text-[#585858]">5K</div>
-          </div>
-          <div>
-            <div className="text-[10px] text-[#949494]">TARGET</div>
-            <div className="text-[15px] font-semibold text-[#585858]">10K</div>
-          </div>
-          <div>
-            <div className="text-[10px] text-[#949494] flex items-center gap-1">
-              <Sparkle />AI POTENTIAL
-            </div>
-            <div className="text-[15px] font-semibold text-[#585858]">12K</div>
-          </div>
-        </div>
+        <MonthlyRevenueTarget />
       </Card>
     </div>
     ),

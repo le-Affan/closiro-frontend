@@ -129,7 +129,7 @@ const GenerateReportButton = ({ selectedProfile }) => {
   );
 };
 
-const SearchActionButton = () => {
+const SearchActionButton = ({ query, setQuery }) => {
   const [open, setOpen] = useState(false);
   const inputRef = useRef(null);
 
@@ -137,13 +137,26 @@ const SearchActionButton = () => {
     if (open && inputRef.current) inputRef.current.focus();
   }, [open]);
 
+  const handleChange = (e) => {
+    setQuery(e.target.value);
+    window.dispatchEvent(new CustomEvent('dashboardSearch', { detail: { query: e.target.value } }));
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setQuery('');
+    window.dispatchEvent(new CustomEvent('dashboardSearch', { detail: { query: '' } }));
+  };
+
   if (open) {
     return (
       <input
         ref={inputRef}
         type="text"
+        value={query}
+        onChange={handleChange}
         placeholder="Search..."
-        onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}
+        onKeyDown={(e) => e.key === 'Escape' && handleClose()}
         onBlur={() => setOpen(false)}
         className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 outline-none w-32"
       />
@@ -179,6 +192,17 @@ const FiltersActionButton = () => {
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
+  const toggle = (opt) => {
+    setChecked((c) => {
+      const next = { ...c, [opt]: !c[opt] };
+      const filters = FILTER_OPTIONS.filter((o) => next[o]);
+      window.dispatchEvent(new CustomEvent('dashboardFilter', { detail: { filters } }));
+      return next;
+    });
+  };
+
+  const activeCount = Object.values(checked).filter(Boolean).length;
+
   return (
     <div className="relative" ref={ref}>
       <button
@@ -192,6 +216,11 @@ const FiltersActionButton = () => {
           <circle cx="10" cy="18" r="2" fill="#585858" />
         </svg>
         Filters
+        {activeCount > 0 && (
+          <span className="bg-[#7ed3cf] text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
+            {activeCount}
+          </span>
+        )}
       </button>
       {open && (
         <div className="absolute top-full left-0 mt-1 bg-white border border-[#e0e0e0] rounded-lg shadow-sm p-3 flex flex-col gap-2 z-50 w-44">
@@ -200,7 +229,7 @@ const FiltersActionButton = () => {
               <input
                 type="checkbox"
                 checked={!!checked[opt]}
-                onChange={() => setChecked((c) => ({ ...c, [opt]: !c[opt] }))}
+                onChange={() => toggle(opt)}
               />
               {opt}
             </label>
@@ -246,6 +275,7 @@ const PeriodActionButton = () => {
               onClick={() => {
                 setLabel(opt);
                 setOpen(false);
+                window.dispatchEvent(new CustomEvent('dashboardPeriod', { detail: { period: opt } }));
               }}
               className="text-left text-[12px] text-[#585858] px-2 py-1.5 rounded hover:bg-[#fafafa]"
             >
@@ -349,6 +379,7 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
 
 const PageHeader = ({ selectedProfile }) => {
   const isAgent = selectedProfile === 'Sales Agent';
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <>
@@ -366,11 +397,17 @@ const PageHeader = ({ selectedProfile }) => {
       {/* Action bar */}
       <div className="flex items-center gap-2">
         <GenerateReportButton selectedProfile={selectedProfile} />
-        <SearchActionButton />
+        <SearchActionButton query={searchQuery} setQuery={setSearchQuery} />
         <FiltersActionButton />
         <PeriodActionButton />
         <AddWidgetActionButton selectedProfile={selectedProfile} />
       </div>
+
+      {searchQuery && (
+        <div className="text-[11px] text-[#737373] bg-[#f5f5f5] inline-block px-2.5 py-1 rounded-md w-fit">
+          Searching for: {searchQuery}
+        </div>
+      )}
     </>
   );
 };
