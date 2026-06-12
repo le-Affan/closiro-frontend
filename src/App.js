@@ -26,7 +26,7 @@ function App() {
 
         {/* Page content */}
         <div className="p-6 flex flex-col gap-5 overflow-y-auto">
-          <PageHeader isAgent={isAgent} />
+          <PageHeader selectedProfile={selectedProfile} />
 
           {isAgent && <AgentView />}
           {isManager && <ManagerView />}

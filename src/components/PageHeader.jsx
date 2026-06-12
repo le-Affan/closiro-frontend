@@ -1,9 +1,24 @@
 import { useState, useRef, useEffect } from 'react';
+import { DownArrow } from './SharedUI';
+
+const PROFILE_CARDS = {
+  'Sales Agent': ['My Stats', 'Personal Targets', 'My Pipeline', 'My Performance'],
+  'Sales Manager': ['Call Activity Trend', 'Rep Performance Score', 'Conversion Rate by Lead Source'],
+  'Admin/Founder': ['Annual Revenue Target', 'Monthly Revenue Target', 'Pipeline Conversation', 'Top Performers'],
+};
+
+const KEY_METRICS = [
+  { label: 'Total Calls', value: '1209', trend: 'up' },
+  { label: 'Connected Calls', value: '842', trend: 'up' },
+  { label: 'Missed Calls', value: '198', trend: 'down' },
+  { label: 'Follow-ups', value: '78', trend: 'up' },
+];
 
 // ---------- interactive action-bar buttons (self-contained) ----------
-const GenerateReportButton = () => {
+const GenerateReportButton = ({ selectedProfile }) => {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [toast, setToast] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -16,6 +31,14 @@ const GenerateReportButton = () => {
     }, 50);
     return () => clearInterval(id);
   }, [open]);
+
+  const handleDownload = () => {
+    setToast(true);
+    setTimeout(() => setToast(false), 2000);
+  };
+
+  const cards = PROFILE_CARDS[selectedProfile] || [];
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
     <>
@@ -30,29 +53,76 @@ const GenerateReportButton = () => {
         Generate report
       </button>
       {open && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[9998]">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
-            <h3 className="text-[14px] font-semibold text-[#585858] mb-3">Report Generated</h3>
-            <div className="h-2 bg-[#f1f1f1] rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#7ed3cf] rounded-full transition-all"
-                style={{ width: `${progress}%` }}
-              />
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9998]">
+          <div className="bg-white rounded-lg shadow-lg w-[480px] max-h-[90vh] overflow-y-auto p-6">
+            <h3 className="text-[16px] font-semibold text-[#585858]">Generate Report</h3>
+            <p className="text-[12px] text-[#949494] mt-1 mb-4">Closira Analytics — {today}</p>
+
+            <div className="border border-[#e0e0e0] rounded-lg p-4">
+              <h4 className="text-[13px] font-semibold text-[#585858] mb-1">Executive Summary</h4>
+              <p className="text-[12px] text-[#737373] mb-4">
+                Overall call activity remained steady this period, with connected calls trending upward across most reps.
+                Conversion rates improved slightly, driven by stronger follow-up discipline on inbound leads.
+              </p>
+
+              <h4 className="text-[13px] font-semibold text-[#585858] mb-2">Key Metrics</h4>
+              <table className="w-full text-[12px] mb-4">
+                <tbody>
+                  {KEY_METRICS.map((m) => (
+                    <tr key={m.label} className="border-b border-[#f1f1f1]">
+                      <td className="py-1.5 text-[#585858]">{m.label}</td>
+                      <td className="py-1.5 text-right text-[#585858] font-medium">{m.value}</td>
+                      <td className="py-1.5 text-right w-6">
+                        <span style={{ display: 'inline-block', transform: m.trend === 'up' ? 'rotate(180deg)' : 'none' }}>
+                          <DownArrow color={m.trend === 'up' ? '#3ca30f' : '#de3226'} />
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <h4 className="text-[13px] font-semibold text-[#585858] mb-2">Charts included</h4>
+              <ul className="text-[12px] text-[#737373] list-disc pl-4 space-y-0.5">
+                {cards.map((c) => <li key={c}>{c}</li>)}
+              </ul>
             </div>
-            {progress >= 100 ? (
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-[12px] text-[#585858]">Ready to download</span>
-                <button
-                  onClick={() => setOpen(false)}
-                  className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5"
-                >
-                  Close
-                </button>
+
+            <div className="mt-4">
+              <div className="h-2 bg-[#f1f1f1] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#7ed3cf] rounded-full transition-all"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
-            ) : (
-              <div className="mt-4 text-[12px] text-[#949494]">Generating...</div>
-            )}
+              {progress >= 100 ? (
+                <div className="mt-2 text-[12px] text-[#3ca30f] font-medium">✓ Report Ready</div>
+              ) : (
+                <div className="mt-2 text-[12px] text-[#949494]">Generating...</div>
+              )}
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                onClick={() => setOpen(false)}
+                className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-4 py-2"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleDownload}
+                className="text-[12px] font-medium text-white bg-[#7ed3cf] rounded-lg px-4 py-2"
+              >
+                Download PDF
+              </button>
+            </div>
           </div>
+
+          {toast && (
+            <div className="fixed bottom-6 right-6 bg-[#585858] text-white text-[12px] px-4 py-2 rounded-md shadow-lg z-[9999]">
+              Downloading...
+            </div>
+          )}
         </div>
       )}
     </>
@@ -188,20 +258,37 @@ const PeriodActionButton = () => {
   );
 };
 
-const ADD_WIDGET_OPTIONS = ['New KPI Card', 'New Chart', 'Export CSV'];
+const WIDGET_OPTIONS = {
+  all: [
+    { name: 'KPI Counter', desc: 'Single metric with trend indicator' },
+    { name: 'Text Note', desc: 'Free-form note or annotation' },
+  ],
+  'Sales Agent': [
+    { name: 'Daily Goal Tracker', desc: 'Track progress toward daily targets' },
+    { name: 'My Call Log', desc: 'Recent calls and outcomes' },
+  ],
+  'Sales Manager': [
+    { name: 'Team Leaderboard', desc: 'Rank reps by performance score' },
+    { name: 'Conversion Funnel', desc: 'Stage-by-stage pipeline breakdown' },
+  ],
+  'Admin/Founder': [
+    { name: 'Revenue Forecast', desc: 'AI-projected revenue trend' },
+    { name: 'AI Insights Panel', desc: 'Automated signals and recommendations' },
+  ],
+};
 
-const AddWidgetActionButton = () => {
+const WidgetIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+    <rect x="3" y="3" width="18" height="18" rx="2" stroke="#7ed3cf" strokeWidth="2" />
+    <path d="M3 9h18M9 21V9" stroke="#7ed3cf" strokeWidth="2" />
+  </svg>
+);
+
+const AddWidgetActionButton = ({ selectedProfile }) => {
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState(false);
-  const ref = useRef(null);
 
-  useEffect(() => {
-    const onClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
-  }, []);
+  const options = [...WIDGET_OPTIONS.all, ...(WIDGET_OPTIONS[selectedProfile] || [])];
 
   const handleSelect = () => {
     setOpen(false);
@@ -210,9 +297,9 @@ const AddWidgetActionButton = () => {
   };
 
   return (
-    <div className="relative" ref={ref}>
+    <>
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpen(true)}
         className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -221,49 +308,68 @@ const AddWidgetActionButton = () => {
         + Add widget
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-[#e0e0e0] rounded-lg shadow-sm p-1 flex flex-col z-50 w-40">
-          {ADD_WIDGET_OPTIONS.map((opt) => (
-            <button
-              key={opt}
-              onClick={handleSelect}
-              className="text-left text-[12px] text-[#585858] px-2 py-1.5 rounded hover:bg-[#fafafa]"
-            >
-              {opt}
-            </button>
-          ))}
+        <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)}>
+          <div
+            className="absolute top-0 right-0 h-full w-[280px] bg-white border-l border-[#e0e0e0] shadow-lg p-4 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[14px] font-semibold text-[#585858]">Add Widget</h3>
+              <button onClick={() => setOpen(false)} className="text-[#949494] text-[16px] leading-none">✕</button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {options.map((opt) => (
+                <button
+                  key={opt.name}
+                  onClick={handleSelect}
+                  className="text-left border border-[#e0e0e0] rounded-lg p-2.5 hover:bg-[#fafafa]"
+                >
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <WidgetIcon />
+                    <span className="text-[11px] font-medium text-[#585858]">{opt.name}</span>
+                  </div>
+                  <p className="text-[10px] text-[#949494]">{opt.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
       {toast && (
-        <div className="absolute top-full left-0 mt-1 bg-[#585858] text-white text-[11px] rounded-lg px-3 py-1.5 z-50 whitespace-nowrap">
-          Coming soon
+        <div className="fixed bottom-6 right-6 bg-[#585858] text-white text-[12px] px-4 py-2 rounded-md shadow-lg z-[9999]">
+          Widget added
         </div>
       )}
-    </div>
+    </>
   );
 };
 
-const PageHeader = ({ isAgent }) => (
-  <>
-    {/* Header */}
-    <div>
-      <h1 className="text-[20px] font-semibold text-[#585858]">Information</h1>
-      <p className="text-[13px] text-[#737373] mt-1">
-        Clear performance summaries to understand call activity, outcomes, and trends at a glance.
-      </p>
-      {isAgent && (
-        <p className="text-[12px] text-[#949494] mt-1">Agent: Ava Chen</p>
-      )}
-    </div>
+const PageHeader = ({ selectedProfile }) => {
+  const isAgent = selectedProfile === 'Sales Agent';
 
-    {/* Action bar */}
-    <div className="flex items-center gap-2">
-      <GenerateReportButton />
-      <SearchActionButton />
-      <FiltersActionButton />
-      <PeriodActionButton />
-      <AddWidgetActionButton />
-    </div>
-  </>
-);
+  return (
+    <>
+      {/* Header */}
+      <div>
+        <h1 className="text-[20px] font-semibold text-[#585858]">Information</h1>
+        <p className="text-[13px] text-[#737373] mt-1">
+          Clear performance summaries to understand call activity, outcomes, and trends at a glance.
+        </p>
+        {isAgent && (
+          <p className="text-[12px] text-[#949494] mt-1">Agent: Ava Chen</p>
+        )}
+      </div>
+
+      {/* Action bar */}
+      <div className="flex items-center gap-2">
+        <GenerateReportButton selectedProfile={selectedProfile} />
+        <SearchActionButton />
+        <FiltersActionButton />
+        <PeriodActionButton />
+        <AddWidgetActionButton selectedProfile={selectedProfile} />
+      </div>
+    </>
+  );
+};
 
 export default PageHeader;
