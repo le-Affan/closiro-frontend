@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext, createContext } from 'react';
+import { useState, useEffect, useRef, useContext, createContext, Children } from 'react';
 import { createPortal } from 'react-dom';
 import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
@@ -562,9 +562,7 @@ const STAT_CENTERED = `flex flex-col h-full [&>*:first-child]:shrink-0 [&>*:firs
 
 const AGENT_STATS_GRID = `${STAT_CENTERED} [&>*:nth-child(2)>div]:!grid [&>*:nth-child(2)>div]:!grid-cols-2 [&>*:nth-child(2)>div]:!grid-rows-2 [&>*:nth-child(2)>div]:!gap-12 [&_.relative]:!w-[200px] [&_.relative]:!h-[200px] ${RECHARTS_FULL} [&_.absolute]:!text-[36px] [&_.absolute]:!font-semibold [&_.absolute]:!text-[#1a1a1a] [&_.text-\\[11px\\]]:!text-[14px] [&_.text-\\[11px\\]]:!text-[#949494] [&_.text-\\[11px\\]]:!mt-2`;
 
-const AGENT_PERFORMANCE_FULL = `${STAT_CENTERED} [&_.relative]:!w-[380px] [&_.relative]:!h-[380px] ${RECHARTS_FULL} [&_.text-\\[28px\\]]:!text-[64px] [&_.text-\\[28px\\]]:!font-bold [&_.text-\\[12px\\]]:!text-[16px] [&_.text-\\[12px\\]]:!text-[#949494] [&_.text-\\[13px\\]]:!text-[20px] [&_.text-\\[13px\\]]:!text-[#737373]`;
-
-const AGENT_TARGETS_BARS = `${TITLE_ROW} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-between [&_.w-36]:!text-[18px] [&_.w-24]:!text-[16px] [&_.h-2]:!h-10 [&_.bg-\\[\\#f1f1f1\\]]:!bg-[#f0f0f0]`;
+const AGENT_TARGETS_BARS = `${TITLE_ROW} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-center`;
 
 // ---------- text size scaling for stat-only fullscreen views ----------
 const TEXT_SIZE_CLASS = {
@@ -610,9 +608,37 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
         </button>
         <div className="flex flex-col" style={{ flex: 1, height: '100%', padding: isStatCentered ? 0 : 32, overflow: 'hidden' }}>
           {isStatCentered ? (
-            <div className={`flex-1 min-h-0 w-full ${cardId === 'agent-stats-row' ? `${AGENT_STATS_GRID} ${textSizeClass}` : AGENT_PERFORMANCE_FULL}`}>
-              {children}
-            </div>
+            cardId === 'agent-performance' ? (
+              <div className="w-full flex flex-col" style={{ height: '85vh' }}>
+                <div style={{ flexShrink: 0, padding: '24px 32px', borderBottom: '1px solid #e8e8e8' }}>
+                  {Children.toArray(children)[0]}
+                </div>
+                <div
+                  className={`w-full ${RECHARTS_FULL} [&_.relative]:!w-[380px] [&_.relative]:!h-[380px] [&_.text-\\[28px\\]]:!text-[64px] [&_.text-\\[28px\\]]:!font-bold [&_.text-\\[12px\\]]:!text-[16px] [&_.text-\\[12px\\]]:!text-[#949494] [&_.text-\\[13px\\]]:!text-[20px] [&_.text-\\[13px\\]]:!text-[#737373]`}
+                  style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <div style={{ width: 380, height: 380, margin: '0 auto' }} className="relative">
+                    {Children.toArray(children)[1]}
+                  </div>
+                  <div className="flex items-center justify-evenly w-full" style={{ marginTop: 24 }}>
+                    {[
+                      { label: 'Score', value: '80%' },
+                      { label: 'Rank', value: '#2 of 8' },
+                      { label: 'Team Avg', value: '65%' },
+                    ].map((s) => (
+                      <div key={s.label} className="flex flex-col items-center gap-1">
+                        <span className="text-[12px] text-[#949494] uppercase">{s.label}</span>
+                        <span className="text-[20px] font-semibold text-[#1a1a1a]">{s.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className={`flex-1 min-h-0 w-full ${AGENT_STATS_GRID} ${textSizeClass}`}>
+                {children}
+              </div>
+            )
           ) : statOnly ? (
             cardId === 'founder-top-performers' ? (
               <div className={`flex flex-col flex-1 min-h-0 w-full overflow-y-auto ${TITLE_ROW} [&_td]:!py-3 [&_th]:!py-3 ${textSizeClass}`}>
@@ -733,7 +759,7 @@ export const RadialGauge = ({ pct, display, label, size = 88, color }) => (
   <div className="flex flex-col items-center gap-2">
     <div className="relative" style={{ width: size, height: size }}>
       <ResponsiveContainer width="100%" height="100%">
-        <RadialBarChart data={[{ value: pct }]} startAngle={90} endAngle={-270} innerRadius="75%" outerRadius="100%" barSize={8}>
+        <RadialBarChart data={[{ value: Math.min(pct, 100) }]} startAngle={90} endAngle={-270} innerRadius="65%" outerRadius="85%" barSize={8}>
           <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
           <RadialBar dataKey="value" cornerRadius={8} fill={color || '#7ed3cf'} background={{ fill: '#f1f1f1' }} />
         </RadialBarChart>
@@ -755,8 +781,8 @@ export const AnimatedProgressBar = ({ label, current, target, pct, color }) => {
   return (
     <div className="flex items-center gap-4">
       <span className="text-[12px] text-[#585858] w-36 shrink-0 stat-label">{label}</span>
-      <div className="flex-1 h-2 bg-[#f1f1f1] rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${width}%`, backgroundColor: color || '#7ed3cf' }} />
+      <div className="flex-1 h-3 bg-[#f0f0f0] rounded-md overflow-hidden">
+        <div className="h-full rounded-md transition-all duration-1000" style={{ width: `${width}%`, backgroundColor: color || '#7ed3cf' }} />
       </div>
       <span className="text-[12px] text-[#949494] w-24 text-right shrink-0 stat-number" style={color ? { color } : undefined}>{current} / {target}</span>
     </div>

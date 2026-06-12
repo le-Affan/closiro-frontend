@@ -32,8 +32,8 @@ const AnnualRevenueTarget = () => {
 
   return (
     <>
-      <div style={{ height: 180 }} className="relative">
-        <ResponsiveContainer width="100%" height="100%">
+      <div style={{ flex: 1, minHeight: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 12, paddingBottom: 12 }} className="relative w-full">
+        <ResponsiveContainer width="100%" height={220}>
           {chartType === 'bar' ? (
             <BarChart data={[
               { name: 'Current', value: Number(current) },
@@ -106,8 +106,8 @@ const MonthlyRevenueTarget = () => {
 
   return (
     <>
-      <div style={{ height: 60 }}>
-        <ResponsiveContainer width="100%" height="100%">
+      <div style={{ flex: 1, minHeight: 80, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '16px 0' }}>
+        <ResponsiveContainer width="100%" height={80}>
           {chartType === 'donut' ? (
             <PieChart>
               <Pie
@@ -147,7 +147,7 @@ const MonthlyRevenueTarget = () => {
           )}
         </ResponsiveContainer>
       </div>
-      <div className="flex justify-between mt-8 px-2">
+      <div className="flex justify-between mt-8 px-2" style={{ flexShrink: 0 }}>
         <div>
           <div className="text-[10px] text-[#949494]">CURRENT</div>
           <div className="text-[15px] font-semibold text-[#585858]">{current}K</div>

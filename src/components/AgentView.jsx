@@ -3,7 +3,7 @@ import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
-import { Card, CardHeader, RadialGauge, AnimatedProgressBar, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
+import { Card, CardHeader, RadialGauge, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { agentStats, personalTargets, myPipelineData } from '../data/mockData';
 
 const LAYOUT_KEY = 'closira-layout-agent';
@@ -26,7 +26,7 @@ const useChartConfig = () => {
 const MyPerformanceGauge = () => {
   const { colors } = useChartConfig();
   return (
-    <RadialBarChart data={[{ value: 80 }]} startAngle={90} endAngle={-270} innerRadius="75%" outerRadius="100%" barSize={14}>
+    <RadialBarChart data={[{ value: Math.min(80, 100) }]} startAngle={90} endAngle={-270} innerRadius="65%" outerRadius="85%" barSize={14}>
       <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
       <RadialBar dataKey="value" cornerRadius={10} fill={colors.primary} background={{ fill: '#f1f1f1' }} />
     </RadialBarChart>
@@ -138,16 +138,19 @@ const AgentView = () => {
       <Card cardId="agent-targets" title="Personal Targets" onDuplicate={handleDuplicate}>
         <CardHeader title="Personal Targets" />
         <div className="flex-1 min-h-0 overflow-hidden">
-          <div className="flex flex-col gap-4 h-full overflow-y-auto">
-            {personalTargets.map((t) => (
-              <div
-                key={t.label}
-                className="flex items-center"
-                style={{ height: `calc((100% - ${(personalTargets.length - 1) * 16}px) / ${personalTargets.length})` }}
-              >
-                <AnimatedProgressBar label={t.label} current={t.current} target={t.target} pct={t.pct} color={targetsColor} />
-              </div>
-            ))}
+          <div className="flex flex-col h-full justify-center overflow-y-auto">
+            {personalTargets.map((t) => {
+              const pct = Math.min(t.pct, 100);
+              return (
+                <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+                  <span style={{ width: 160, fontSize: 14, color: '#585858' }}>{t.label}</span>
+                  <div style={{ flex: 1, height: 12, background: '#f0f0f0', borderRadius: 6, overflow: 'hidden' }}>
+                    <div style={{ width: pct + '%', height: '100%', background: targetsColor || '#7ed3cf', borderRadius: 6 }} />
+                  </div>
+                  <span style={{ width: 80, textAlign: 'right', fontSize: 13, color: '#737373' }}>{t.current} / {t.target}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </Card>
