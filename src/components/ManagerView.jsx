@@ -174,72 +174,6 @@ const ManagerView = () => {
     rows: leadSourceData.map((s) => [s.name, `${s.value}%`]),
   };
 
-  const cards = {
-    'manager-kpi-pills': (
-      <Card cardId="manager-kpi-pills">
-        <div className="flex items-center gap-8">
-          {kpis.map((kpi) => (
-            <div key={kpi.label} className="flex items-center gap-2">
-              <DownArrow color={kpi.color} />
-              <div>
-                <div className="text-[11px] text-[#949494] stat-label">{kpi.label}</div>
-                <div className="text-[15px] font-semibold text-[#585858] stat-number" style={kpiColor ? { color: kpiColor } : undefined}>{kpi.value}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-    ),
-    'manager-call-trend': (
-      <Card cardId="manager-call-trend" data={trendTableData}>
-        <CardHeader title="Call Activity Trend" />
-        {period && (
-          <div className="mb-3 text-[11px] text-[#737373] bg-[#f5f5f5] border border-[#eaeaea] inline-block px-2.5 py-1 rounded-md">
-            Showing data for: {period}
-          </div>
-        )}
-        <div className="bg-[#fafafa] rounded-lg p-2 flex-1 min-h-0 flex flex-col">
-          <ResponsiveContainer width="100%" height="100%">
-            <CallActivityChart />
-          </ResponsiveContainer>
-        </div>
-      </Card>
-    ),
-    'manager-rep-performance': (
-      <Card cardId="manager-rep-performance" data={repTableData}>
-        <CardHeader title="Rep Performance Score" />
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <RepPerformanceList reps={filteredRepData} />
-        </div>
-        <div className="flex items-center gap-6 mt-4 text-[11px] text-[#737373] shrink-0">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#3ca30f]" /> GOOD <span className="font-semibold text-[#585858]">70%</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#f1a013]" /> AVERAGE <span className="font-semibold text-[#585858]">25%</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#de3226]" /> BAD <span className="font-semibold text-[#585858]">5%</span>
-          </div>
-        </div>
-        <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858] shrink-0">
-          <span>Improve 30% + lift in calls to conversion</span>
-          <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
-        </div>
-      </Card>
-    ),
-    'manager-lead-source': (
-      <Card cardId="manager-lead-source" data={leadSourceTableData}>
-        <CardHeader title="Conversion Rate by Lead Source" />
-        <div className="flex-1 min-h-0 flex flex-col">
-          <ResponsiveContainer width="100%" height="100%">
-            <ConversionByLeadSourceChart />
-          </ResponsiveContainer>
-        </div>
-      </Card>
-    ),
-  };
-
   const [layouts, setLayouts] = useState(() => {
     try {
       const saved = localStorage.getItem(LAYOUT_KEY);
@@ -274,11 +208,87 @@ const ManagerView = () => {
     return () => window.removeEventListener('addWidget', handler);
   }, []);
 
+  const handleDuplicate = (cardTitle, cardId) => {
+    const id = Date.now();
+    const widgetId = `added-widget-${id}`;
+    setAddedWidgets((prev) => [...prev, { id, name: `${cardTitle} (Copy)`, type: cardId, sourceCardId: cardId }]);
+    updateLayouts((prev) => ({
+      ...prev,
+      lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
+    }));
+  };
+
+  const cards = {
+    'manager-kpi-pills': (
+      <Card cardId="manager-kpi-pills">
+        <div className="flex items-center gap-8">
+          {kpis.map((kpi) => (
+            <div key={kpi.label} className="flex items-center gap-2">
+              <DownArrow color={kpi.color} />
+              <div>
+                <div className="text-[11px] text-[#949494] stat-label">{kpi.label}</div>
+                <div className="text-[15px] font-semibold text-[#585858] stat-number" style={kpiColor ? { color: kpiColor } : undefined}>{kpi.value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    ),
+    'manager-call-trend': (
+      <Card cardId="manager-call-trend" title="Call Activity Trend" data={trendTableData} onDuplicate={handleDuplicate}>
+        <CardHeader title="Call Activity Trend" />
+        {period && (
+          <div className="mb-3 text-[11px] text-[#737373] bg-[#f5f5f5] border border-[#eaeaea] inline-block px-2.5 py-1 rounded-md">
+            Showing data for: {period}
+          </div>
+        )}
+        <div className="bg-[#fafafa] rounded-lg p-2 flex-1 min-h-0 flex flex-col">
+          <ResponsiveContainer width="100%" height="100%">
+            <CallActivityChart />
+          </ResponsiveContainer>
+        </div>
+      </Card>
+    ),
+    'manager-rep-performance': (
+      <Card cardId="manager-rep-performance" title="Rep Performance Score" data={repTableData} onDuplicate={handleDuplicate}>
+        <CardHeader title="Rep Performance Score" />
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <RepPerformanceList reps={filteredRepData} />
+        </div>
+        <div className="flex items-center gap-6 mt-4 text-[11px] text-[#737373] shrink-0">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#3ca30f]" /> GOOD <span className="font-semibold text-[#585858]">70%</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#f1a013]" /> AVERAGE <span className="font-semibold text-[#585858]">25%</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#de3226]" /> BAD <span className="font-semibold text-[#585858]">5%</span>
+          </div>
+        </div>
+        <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858] shrink-0">
+          <span>Improve 30% + lift in calls to conversion</span>
+          <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
+        </div>
+      </Card>
+    ),
+    'manager-lead-source': (
+      <Card cardId="manager-lead-source" title="Conversion Rate by Lead Source" data={leadSourceTableData} onDuplicate={handleDuplicate}>
+        <CardHeader title="Conversion Rate by Lead Source" />
+        <div className="flex-1 min-h-0 flex flex-col">
+          <ResponsiveContainer width="100%" height="100%">
+            <ConversionByLeadSourceChart />
+          </ResponsiveContainer>
+        </div>
+      </Card>
+    ),
+  };
+
   const widgetCards = {};
   addedWidgets.forEach((w) => {
     const widgetId = `added-widget-${w.id}`;
     widgetCards[widgetId] = (
-      <Card cardId={widgetId} onRemove={() => {
+      <Card cardId={widgetId} title={w.name} onDuplicate={handleDuplicate} onRemove={() => {
         setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
         updateLayouts((prev) => ({ ...prev, lg: prev.lg.filter((l) => l.i !== widgetId) }));
       }}>

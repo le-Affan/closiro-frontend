@@ -79,60 +79,6 @@ const AgentView = () => {
     rows: [['Ava Chen', '80%', '#2 of 8']],
   };
 
-  const cards = {
-    'agent-stats-row': (
-      <Card cardId="agent-stats-row">
-        <CardHeader title="My Stats" />
-        <div className="flex-1 min-h-0 overflow-hidden flex items-center justify-around">
-          {agentStats.map((s) => (
-            <RadialGauge key={s.label} pct={s.pct} display={s.display} label={s.label} color={statsColor} />
-          ))}
-        </div>
-      </Card>
-    ),
-    'agent-targets': (
-      <Card cardId="agent-targets">
-        <CardHeader title="Personal Targets" />
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <div className="flex flex-col gap-4 h-full overflow-y-auto">
-            {personalTargets.map((t) => (
-              <div
-                key={t.label}
-                className="flex items-center"
-                style={{ height: `calc((100% - ${(personalTargets.length - 1) * 16}px) / ${personalTargets.length})` }}
-              >
-                <AnimatedProgressBar label={t.label} current={t.current} target={t.target} pct={t.pct} color={targetsColor} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-    ),
-    'agent-pipeline': (
-      <Card cardId="agent-pipeline" data={pipelineTableData}>
-        <CardHeader title="My Pipeline" />
-        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-          <MyPipelineChart />
-        </div>
-        <div className="mt-2 text-center text-[12px] font-semibold text-[#3ca30f] shrink-0">12% Conversion to Won</div>
-      </Card>
-    ),
-    'agent-performance': (
-      <Card cardId="agent-performance" data={performanceTableData}>
-        <CardHeader title="My Performance" />
-        <div className="flex-1 min-h-0 overflow-hidden flex flex-col items-center justify-center gap-2 py-2">
-          <div className="relative" style={{ width: 180, height: 180 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <MyPerformanceGauge />
-            </ResponsiveContainer>
-            <MyPerformanceLabel />
-          </div>
-          <span className="text-[13px] font-medium text-[#585858]">Ava Chen</span>
-        </div>
-      </Card>
-    ),
-  };
-
   const [layouts, setLayouts] = useState(() => {
     try {
       const saved = localStorage.getItem(LAYOUT_KEY);
@@ -167,11 +113,75 @@ const AgentView = () => {
     return () => window.removeEventListener('addWidget', handler);
   }, []);
 
+  const handleDuplicate = (cardTitle, cardId) => {
+    const id = Date.now();
+    const widgetId = `added-widget-${id}`;
+    setAddedWidgets((prev) => [...prev, { id, name: `${cardTitle} (Copy)`, type: cardId, sourceCardId: cardId }]);
+    updateLayouts((prev) => ({
+      ...prev,
+      lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
+    }));
+  };
+
+  const cards = {
+    'agent-stats-row': (
+      <Card cardId="agent-stats-row" title="My Stats" onDuplicate={handleDuplicate}>
+        <CardHeader title="My Stats" />
+        <div className="flex-1 min-h-0 overflow-hidden flex items-center justify-around">
+          {agentStats.map((s) => (
+            <RadialGauge key={s.label} pct={s.pct} display={s.display} label={s.label} color={statsColor} />
+          ))}
+        </div>
+      </Card>
+    ),
+    'agent-targets': (
+      <Card cardId="agent-targets" title="Personal Targets" onDuplicate={handleDuplicate}>
+        <CardHeader title="Personal Targets" />
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex flex-col gap-4 h-full overflow-y-auto">
+            {personalTargets.map((t) => (
+              <div
+                key={t.label}
+                className="flex items-center"
+                style={{ height: `calc((100% - ${(personalTargets.length - 1) * 16}px) / ${personalTargets.length})` }}
+              >
+                <AnimatedProgressBar label={t.label} current={t.current} target={t.target} pct={t.pct} color={targetsColor} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    ),
+    'agent-pipeline': (
+      <Card cardId="agent-pipeline" title="My Pipeline" data={pipelineTableData} onDuplicate={handleDuplicate}>
+        <CardHeader title="My Pipeline" />
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <MyPipelineChart />
+        </div>
+        <div className="mt-2 text-center text-[12px] font-semibold text-[#3ca30f] shrink-0">12% Conversion to Won</div>
+      </Card>
+    ),
+    'agent-performance': (
+      <Card cardId="agent-performance" title="My Performance" data={performanceTableData} onDuplicate={handleDuplicate}>
+        <CardHeader title="My Performance" />
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col items-center justify-center gap-2 py-2">
+          <div className="relative" style={{ width: 180, height: 180 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <MyPerformanceGauge />
+            </ResponsiveContainer>
+            <MyPerformanceLabel />
+          </div>
+          <span className="text-[13px] font-medium text-[#585858]">Ava Chen</span>
+        </div>
+      </Card>
+    ),
+  };
+
   const widgetCards = {};
   addedWidgets.forEach((w) => {
     const widgetId = `added-widget-${w.id}`;
     widgetCards[widgetId] = (
-      <Card cardId={widgetId} onRemove={() => {
+      <Card cardId={widgetId} title={w.name} onDuplicate={handleDuplicate} onRemove={() => {
         setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
         updateLayouts((prev) => ({ ...prev, lg: prev.lg.filter((l) => l.i !== widgetId) }));
       }}>

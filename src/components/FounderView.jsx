@@ -219,84 +219,6 @@ const FounderView = () => {
     rows: pipelineData.map((d) => [d.name, d.value]),
   };
 
-  const cards = {
-    'founder-kpi-pills': (
-      <Card cardId="founder-kpi-pills">
-        <div className="flex items-center gap-8">
-          {adminKpis.map((kpi) => (
-            <div key={kpi.label} className="flex items-center gap-2">
-              <DownArrow color={kpi.color} />
-              <div>
-                <div className="text-[11px] text-[#949494] stat-label">{kpi.label}</div>
-                <div className="text-[15px] font-semibold text-[#585858] stat-number" style={kpiColor ? { color: kpiColor } : undefined}>{kpi.value}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-    ),
-    'founder-annual-revenue': (
-      <Card cardId="founder-annual-revenue" data={annualTableData} hasChart>
-        <CardHeader title="Annual Revenue Target" />
-        <AnnualRevenueTarget />
-        <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
-          <span>Improve 30% + lift in calls to conversion</span>
-          <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
-        </div>
-      </Card>
-    ),
-    'founder-monthly-revenue': (
-      <Card cardId="founder-monthly-revenue" data={monthlyTableData} hasChart>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-1.5">
-            <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5 hover:bg-[#f4f6f8] transition-colors duration-150">
-              Check how to improve
-            </button>
-            <ConnectedCardMenu />
-          </div>
-        </div>
-        <MonthlyRevenueTarget />
-      </Card>
-    ),
-    'founder-pipeline': (
-      <Card cardId="founder-pipeline" data={pipelineTableData}>
-        <CardHeader title="Pipeline conversation" />
-        <div className="mb-3">
-          <span className="bg-[#eaf7e9] text-[#3ca30f] text-[11px] font-medium rounded-full px-3 py-1">
-            AI projects 28% conversion by Q3
-          </span>
-        </div>
-        <div className="flex items-stretch flex-1 min-h-0">
-          <div className="flex-1 h-full flex flex-col">
-            <ResponsiveContainer width="100%" height="100%">
-              <PipelineChart />
-            </ResponsiveContainer>
-          </div>
-          <div className="flex flex-col items-center gap-2 pl-6 w-32 shrink-0">
-            <svg width="20" height="40" viewBox="0 0 20 40" fill="none">
-              <path d="M10 2V36M10 36L3 29M10 36L17 29" stroke="#3ca30f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="text-[12px] font-semibold text-[#3ca30f] text-center">20% Conversion to Won</span>
-          </div>
-        </div>
-      </Card>
-    ),
-    'founder-top-performers': (
-      <Card cardId="founder-top-performers">
-        <CardHeader title="Top Performers" />
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          <PerformersTable data={repPerformanceTable} color={performersColor} />
-        </div>
-      </Card>
-    ),
-  };
-
   const [layouts, setLayouts] = useState(() => {
     try {
       const saved = localStorage.getItem(LAYOUT_KEY);
@@ -331,11 +253,99 @@ const FounderView = () => {
     return () => window.removeEventListener('addWidget', handler);
   }, []);
 
+  const handleDuplicate = (cardTitle, cardId) => {
+    const id = Date.now();
+    const widgetId = `added-widget-${id}`;
+    setAddedWidgets((prev) => [...prev, { id, name: `${cardTitle} (Copy)`, type: cardId, sourceCardId: cardId }]);
+    updateLayouts((prev) => ({
+      ...prev,
+      lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
+    }));
+  };
+
+  const cards = {
+    'founder-kpi-pills': (
+      <Card cardId="founder-kpi-pills">
+        <div className="flex items-center gap-8">
+          {adminKpis.map((kpi) => (
+            <div key={kpi.label} className="flex items-center gap-2">
+              <DownArrow color={kpi.color} />
+              <div>
+                <div className="text-[11px] text-[#949494] stat-label">{kpi.label}</div>
+                <div className="text-[15px] font-semibold text-[#585858] stat-number" style={kpiColor ? { color: kpiColor } : undefined}>{kpi.value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    ),
+    'founder-annual-revenue': (
+      <Card cardId="founder-annual-revenue" title="Annual Revenue Target" data={annualTableData} hasChart onDuplicate={handleDuplicate}>
+        <CardHeader title="Annual Revenue Target" />
+        <AnnualRevenueTarget />
+        <div className="mt-4 bg-[#eaf7e9] rounded-lg px-4 py-2 flex items-center justify-between text-[12px] text-[#585858]">
+          <span>Improve 30% + lift in calls to conversion</span>
+          <span className="font-semibold cursor-pointer hover:underline transition-colors duration-150">Check how</span>
+        </div>
+      </Card>
+    ),
+    'founder-monthly-revenue': (
+      <Card cardId="founder-monthly-revenue" title="Monthly Revenue Target" data={monthlyTableData} hasChart onDuplicate={handleDuplicate}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-1.5">
+            <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5 hover:bg-[#f4f6f8] transition-colors duration-150">
+              Check how to improve
+            </button>
+            <ConnectedCardMenu />
+          </div>
+        </div>
+        <MonthlyRevenueTarget />
+      </Card>
+    ),
+    'founder-pipeline': (
+      <Card cardId="founder-pipeline" title="Pipeline conversation" data={pipelineTableData} onDuplicate={handleDuplicate}>
+        <CardHeader title="Pipeline conversation" />
+        <div className="mb-3">
+          <span className="bg-[#eaf7e9] text-[#3ca30f] text-[11px] font-medium rounded-full px-3 py-1">
+            AI projects 28% conversion by Q3
+          </span>
+        </div>
+        <div className="flex items-stretch flex-1 min-h-0">
+          <div className="flex-1 h-full flex flex-col">
+            <ResponsiveContainer width="100%" height="100%">
+              <PipelineChart />
+            </ResponsiveContainer>
+          </div>
+          <div className="flex flex-col items-center gap-2 pl-6 w-32 shrink-0">
+            <svg width="20" height="40" viewBox="0 0 20 40" fill="none">
+              <path d="M10 2V36M10 36L3 29M10 36L17 29" stroke="#3ca30f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="text-[12px] font-semibold text-[#3ca30f] text-center">20% Conversion to Won</span>
+          </div>
+        </div>
+      </Card>
+    ),
+    'founder-top-performers': (
+      <Card cardId="founder-top-performers" title="Top Performers" onDuplicate={handleDuplicate}>
+        <CardHeader title="Top Performers" />
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <PerformersTable data={repPerformanceTable} color={performersColor} />
+        </div>
+      </Card>
+    ),
+  };
+
   const widgetCards = {};
   addedWidgets.forEach((w) => {
     const widgetId = `added-widget-${w.id}`;
     widgetCards[widgetId] = (
-      <Card cardId={widgetId} onRemove={() => {
+      <Card cardId={widgetId} title={w.name} onDuplicate={handleDuplicate} onRemove={() => {
         setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
         updateLayouts((prev) => ({ ...prev, lg: prev.lg.filter((l) => l.i !== widgetId) }));
       }}>

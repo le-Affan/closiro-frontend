@@ -660,7 +660,7 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
   );
 };
 
-export const Card = ({ children, className = '', cardId, data, hasChart, onRemove }) => {
+export const Card = ({ children, className = '', cardId, title, data, hasChart, onRemove, onDuplicate }) => {
   const { getConfig } = useContext(ChartConfigRegistryContext);
   const config = getConfig(cardId, CHART_DEFAULTS[cardId] || {});
   const [modalMode, setModalMode] = useState(null);
@@ -668,7 +668,6 @@ export const Card = ({ children, className = '', cardId, data, hasChart, onRemov
   const [removed, setRemoved] = useState(false);
   const [toast, setToast] = useState(null);
   const [toastVisible, setToastVisible] = useState(false);
-  const [duplicates, setDuplicates] = useState([]);
 
   useEffect(() => {
     if (!toast) return;
@@ -685,46 +684,40 @@ export const Card = ({ children, className = '', cardId, data, hasChart, onRemov
     openModal: setModalMode,
     showToast: setToast,
     requestDelete: () => setConfirmDelete(true),
-    requestDuplicate: () => setDuplicates((d) => [...d, Date.now()]),
+    requestDuplicate: () => onDuplicate?.(title, cardId),
   };
 
   return (
-    <>
-      <CardIdContext.Provider value={cardId}>
-        <CardContext.Provider value={ctx}>
-          <div className={`relative group bg-white border border-[#e8e8e8] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-150 p-5 h-full overflow-hidden flex flex-col ${className}`} style={config.background ? { backgroundColor: config.background } : undefined}>
-            <div className="drag-handle absolute top-2 left-2 text-[#bebebe] hover:text-[#737373] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing select-none">⠿</div>
-            {children}
+    <CardIdContext.Provider value={cardId}>
+      <CardContext.Provider value={ctx}>
+        <div className={`relative group bg-white border border-[#e8e8e8] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-150 p-5 h-full overflow-hidden flex flex-col ${className}`} style={config.background ? { backgroundColor: config.background } : undefined}>
+          <div className="drag-handle absolute top-2 left-2 text-[#bebebe] hover:text-[#737373] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing select-none">⠿</div>
+          {children}
 
-            {toast && (
-              <div className={`fixed bottom-6 right-6 bg-[#1a1a1a] text-white text-[13px] px-5 py-3 rounded-lg shadow-lg z-50 border-l-[3px] ${toast.includes('duplicated') ? 'border-l-[#22c55e]' : 'border-l-[#5bc4bf]'} transition-all duration-300 ${toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>{toast}</div>
-            )}
+          {toast && (
+            <div className={`fixed bottom-6 right-6 bg-[#1a1a1a] text-white text-[13px] px-5 py-3 rounded-lg shadow-lg z-50 border-l-[3px] ${toast.includes('duplicated') ? 'border-l-[#22c55e]' : 'border-l-[#5bc4bf]'} transition-all duration-300 ${toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>{toast}</div>
+          )}
 
-            {confirmDelete && (
-              <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-lg p-5 w-72">
-                  <p className="text-[13px] text-[#585858] mb-4">Remove this widget?</p>
-                  <div className="flex justify-end gap-2">
-                    <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 text-[12px] rounded-lg border border-[#e0e0e0] text-[#585858]">Cancel</button>
-                    <button onClick={() => { setRemoved(true); setConfirmDelete(false); onRemove?.(); }} className="px-3 py-1.5 text-[12px] rounded-lg bg-[#de3226] text-white">Remove</button>
-                  </div>
+          {confirmDelete && (
+            <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+              <div className="bg-white rounded-xl shadow-lg p-5 w-72">
+                <p className="text-[13px] text-[#585858] mb-4">Remove this widget?</p>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 text-[12px] rounded-lg border border-[#e0e0e0] text-[#585858]">Cancel</button>
+                  <button onClick={() => { setRemoved(true); setConfirmDelete(false); onRemove?.(); }} className="px-3 py-1.5 text-[12px] rounded-lg bg-[#de3226] text-white">Remove</button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {modalMode && (
-              <FullscreenModal mode={modalMode} cardId={cardId} data={data} hasChart={hasChart} onClose={() => setModalMode(null)}>
-                {children}
-              </FullscreenModal>
-            )}
-          </div>
-        </CardContext.Provider>
-      </CardIdContext.Provider>
-
-      {duplicates.map((id) => (
-        <Card key={id} className={className} cardId={cardId} data={data} hasChart={hasChart}>{children}</Card>
-      ))}
-    </>
+          {modalMode && (
+            <FullscreenModal mode={modalMode} cardId={cardId} data={data} hasChart={hasChart} onClose={() => setModalMode(null)}>
+              {children}
+            </FullscreenModal>
+          )}
+        </div>
+      </CardContext.Provider>
+    </CardIdContext.Provider>
   );
 };
 
