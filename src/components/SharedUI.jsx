@@ -502,6 +502,27 @@ const AccordionRow = ({ label, open, onToggle, row, config, onUpdate, data }) =>
   </div>
 );
 
+// ---------- per-card fullscreen layout overrides ----------
+const RECHARTS_FULL = '[&_.recharts-responsive-container]:!w-full [&_.recharts-responsive-container]:!h-full';
+const TITLE_ROW = '[&>*:first-child]:shrink-0 [&>*:first-child]:pb-4 [&>*:first-child]:border-b [&>*:first-child]:border-[#e8e8e8]';
+const DEFAULT_EXTRA = `[&>div:first-child]:shrink-0 [&>div:first-child]:!mb-0 [&>div:first-child]:pb-4 [&>div:first-child]:border-b [&>div:first-child]:border-[#e8e8e8] [&>div:last-child]:flex-1 [&>div:last-child]:min-h-0 [&>div:last-child]:!h-auto [&>div:last-child]:flex [&>div:last-child]:flex-col [&>div:last-child]:justify-center [&>div:last-child]:overflow-y-auto ${RECHARTS_FULL}`;
+
+const FULLSCREEN_CONFIG = {
+  'manager-rep-performance': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-center [&_.h-1\\.5]:!h-8 [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
+  'founder-annual-revenue': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
+  'founder-monthly-revenue': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0`,
+  'founder-pipeline': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:shrink-0 [&>*:nth-child(3)]:flex-1 [&>*:nth-child(3)]:min-h-0 [&>*:nth-child(3)>*:first-child]:!h-full [&_.rounded-md]:flex-1`,
+  'agent-pipeline': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0 [&_.rounded-md]:flex-1`,
+};
+
+const STAT_CENTERED = `flex flex-col h-full [&>*:first-child]:shrink-0 [&>*:first-child]:!mb-0 [&>*:first-child]:px-8 [&>*:first-child]:py-6 [&>*:first-child]:border-b [&>*:first-child]:border-[#e8e8e8] [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:items-center [&>*:nth-child(2)]:justify-center [&>*:nth-child(2)]:p-8`;
+
+const AGENT_STATS_GRID = `${STAT_CENTERED} [&>*:nth-child(2)>div]:!grid [&>*:nth-child(2)>div]:!grid-cols-2 [&>*:nth-child(2)>div]:!grid-rows-2 [&>*:nth-child(2)>div]:!gap-12 [&_.relative]:!w-[200px] [&_.relative]:!h-[200px] ${RECHARTS_FULL} [&_.absolute]:!text-[36px] [&_.absolute]:!font-semibold [&_.absolute]:!text-[#1a1a1a] [&_.text-\\[11px\\]]:!text-[14px] [&_.text-\\[11px\\]]:!text-[#949494] [&_.text-\\[11px\\]]:!mt-2`;
+
+const AGENT_PERFORMANCE_FULL = `${STAT_CENTERED} [&_.relative]:!w-[380px] [&_.relative]:!h-[380px] ${RECHARTS_FULL} [&_.text-\\[28px\\]]:!text-[64px] [&_.text-\\[28px\\]]:!font-bold [&_.text-\\[12px\\]]:!text-[16px] [&_.text-\\[12px\\]]:!text-[#949494] [&_.text-\\[13px\\]]:!text-[20px] [&_.text-\\[13px\\]]:!text-[#737373]`;
+
+const AGENT_TARGETS_BARS = `${TITLE_ROW} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-between [&_.w-36]:!text-[18px] [&_.w-24]:!text-[16px] [&_.h-2]:!h-10 [&_.bg-\\[\\#f1f1f1\\]]:!bg-[#f0f0f0] [&_.bg-\\[\\#7ed3cf\\]]:!bg-[var(--bar-fill)]`;
+
 const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) => {
   const { getConfig, setConfig } = useContext(ChartConfigRegistryContext);
   const [openRow, setOpenRow] = useState(null);
@@ -511,28 +532,44 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
   const defaults = CHART_DEFAULTS[cardId] || {};
   const config = getConfig(cardId, defaults);
   const onUpdate = (path, value) => setConfig(cardId, setPath(config, path, value));
+  const isStatCentered = cardId === 'agent-stats-row' || cardId === 'agent-performance';
+  const showSettingsPanel = mode === 'settings' && !statOnly;
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-      <div className="relative bg-white rounded-xl shadow-lg w-[90vw] max-w-[1300px] h-[85vh] flex flex-row overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+      <div className="relative bg-white rounded-xl shadow-lg flex flex-row overflow-hidden" style={{ width: '95vw', height: isStatCentered && !showSettingsPanel ? '85vh' : '92vh' }}>
         <button onClick={onClose} className="absolute top-3 right-3 z-10 flex items-center justify-center" aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M6 6L18 18M18 6L6 18" stroke="#3a3a3a" strokeWidth="3" strokeLinecap="round" />
           </svg>
         </button>
-        <div className="flex-1 overflow-y-auto p-8 flex items-center justify-center">
-          {statOnly ? (
-            <div className="[&_.stat-number]:text-3xl [&_.stat-label]:text-sm p-12 flex items-center justify-center w-full scale-150">
+        <div className="flex flex-col" style={{ flex: 1, height: '100%', padding: isStatCentered ? 0 : 32, overflow: 'hidden' }}>
+          {isStatCentered ? (
+            <div className={`flex-1 min-h-0 w-full ${cardId === 'agent-stats-row' ? AGENT_STATS_GRID : AGENT_PERFORMANCE_FULL}`}>
               {children}
             </div>
+          ) : statOnly ? (
+            cardId === 'founder-top-performers' ? (
+              <div className={`flex flex-col flex-1 min-h-0 w-full overflow-y-auto ${TITLE_ROW} [&_td]:!py-3 [&_th]:!py-3`}>
+                {children}
+              </div>
+            ) : cardId === 'agent-targets' ? (
+              <div className={`flex flex-col flex-1 min-h-0 w-full ${AGENT_TARGETS_BARS}`} style={{ '--bar-fill': config?.colors?.primary || '#7ed3cf' }}>
+                {children}
+              </div>
+            ) : (
+              <div className="flex-1 min-h-0 flex flex-col items-center justify-center overflow-y-auto w-full scale-150 [&_.stat-number]:text-3xl [&_.stat-label]:text-sm">
+                {children}
+              </div>
+            )
           ) : (
-            <div style={{ height: 480, width: '100%' }}>
+            <div className={`flex-1 min-h-0 flex flex-col w-full ${FULLSCREEN_CONFIG[cardId] || DEFAULT_EXTRA}`}>
               {children}
             </div>
           )}
         </div>
         {mode === 'settings' && !statOnly && (
-          <div className="w-[320px] border-l border-[#e0e0e0] p-6 overflow-y-auto shrink-0">
+          <div className="border-l border-[#e0e0e0] p-6 overflow-y-auto" style={{ width: 300, flexShrink: 0 }}>
             <h4 className="text-[15px] font-semibold text-[#1a1a1a] mb-3">Widget settings</h4>
             {schema ? (
               schema.map((row) => (
@@ -557,7 +594,7 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
   );
 };
 
-export const Card = ({ children, className = '', cardId, data, hasChart }) => {
+export const Card = ({ children, className = '', cardId, data, hasChart, onRemove }) => {
   const [modalMode, setModalMode] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [removed, setRemoved] = useState(false);
@@ -601,7 +638,7 @@ export const Card = ({ children, className = '', cardId, data, hasChart }) => {
                   <p className="text-[13px] text-[#585858] mb-4">Remove this widget?</p>
                   <div className="flex justify-end gap-2">
                     <button onClick={() => setConfirmDelete(false)} className="px-3 py-1.5 text-[12px] rounded-lg border border-[#e0e0e0] text-[#585858]">Cancel</button>
-                    <button onClick={() => { setRemoved(true); setConfirmDelete(false); }} className="px-3 py-1.5 text-[12px] rounded-lg bg-[#de3226] text-white">Remove</button>
+                    <button onClick={() => { setRemoved(true); setConfirmDelete(false); onRemove?.(); }} className="px-3 py-1.5 text-[12px] rounded-lg bg-[#de3226] text-white">Remove</button>
                   </div>
                 </div>
               </div>

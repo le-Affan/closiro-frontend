@@ -123,24 +123,36 @@ const AgentView = () => {
 
   useEffect(() => {
     const handler = (e) => {
-      setAddedWidgets((prev) => [...prev, { name: e.detail.name, type: e.detail.type, id: Date.now() }]);
+      const id = Date.now();
+      setAddedWidgets((prev) => [...prev, { name: e.detail.name, type: e.detail.type, id }]);
+      setCardOrder((order) => [...order, `added-widget-${id}`]);
     };
     window.addEventListener('addWidget', handler);
     return () => window.removeEventListener('addWidget', handler);
   }, []);
 
+  const widgetCards = {};
+  addedWidgets.forEach((w) => {
+    const widgetId = `added-widget-${w.id}`;
+    widgetCards[widgetId] = (
+      <Card cardId={widgetId} onRemove={() => {
+        setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
+        setCardOrder((order) => order.filter((id) => id !== widgetId));
+      }}>
+        <CardHeader title={w.name} />
+        <p className="text-[12px] text-[#949494]">Widget type: {w.type}</p>
+      </Card>
+    );
+  });
+
+  const allCards = { ...cards, ...widgetCards };
+
   return (
     <>
       {cardOrder.map((id, index) => (
         <DraggableCard key={id} index={index} onReorder={handleReorder}>
-          {cards[id]}
+          {allCards[id]}
         </DraggableCard>
-      ))}
-      {addedWidgets.map((w) => (
-        <Card key={w.id}>
-          <CardHeader title={w.name} />
-          <p className="text-[12px] text-[#949494]">Widget type: {w.type}</p>
-        </Card>
       ))}
     </>
   );
