@@ -1,6 +1,9 @@
 const TopBar = () => (
   <div className="h-[54px] flex items-center justify-between px-6 border-b border-[#f1f1f1] shrink-0">
-    <div className="flex items-center gap-2 text-[13px] text-[#737373]">
+    <div className="flex items-center gap-3 text-[13px] text-[#737373]">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18l-6-6 6-6" stroke="#bebebe" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
       <span>Calls</span>
       <span className="text-[#bebebe]">/</span>
       <span className="text-[#585858] font-medium">Information</span>
@@ -18,6 +21,16 @@ const TopBar = () => (
       </button>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <circle cx="12" cy="12" r="10" stroke="#bebebe" strokeWidth="2" />
+        <path d="M12 8v4M12 16h.01" stroke="#bebebe" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M18 8a6 6 0 00-12 0c0 4-1.5 5.5-1.5 5.5h15S18 12 18 8z" stroke="#bebebe" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M10.5 17a1.5 1.5 0 003 0" stroke="#bebebe" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="#bebebe" strokeWidth="2" />
+        <circle cx="12" cy="10" r="3" stroke="#bebebe" strokeWidth="2" />
+        <path d="M6 19c1-2.5 3.5-4 6-4s5 1.5 6 4" stroke="#bebebe" strokeWidth="2" strokeLinecap="round" />
       </svg>
     </div>
   </div>

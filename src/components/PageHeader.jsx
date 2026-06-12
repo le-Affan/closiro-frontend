@@ -21,8 +21,12 @@ const GenerateReportButton = () => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="bg-[#7ed3cf] text-white text-[12px] font-medium rounded-lg px-4 py-2"
+        className="bg-[#7ed3cf] text-white text-[12px] font-medium rounded-lg px-4 py-2 flex items-center gap-1.5"
       >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M12 20h9" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
         Generate report
       </button>
       {open && (
@@ -79,8 +83,12 @@ const SearchActionButton = () => {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2"
+      className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
     >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7" stroke="#585858" strokeWidth="2" />
+        <path d="M21 21l-4-4" stroke="#585858" strokeWidth="2" strokeLinecap="round" />
+      </svg>
       Search
     </button>
   );
@@ -105,8 +113,14 @@ const FiltersActionButton = () => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
       >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M4 6h16M8 6v0M4 12h16M14 12v0M4 18h16M10 18v0" stroke="#585858" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="8" cy="6" r="2" fill="#585858" />
+          <circle cx="14" cy="12" r="2" fill="#585858" />
+          <circle cx="10" cy="18" r="2" fill="#585858" />
+        </svg>
         Filters
       </button>
       {open && (
@@ -146,8 +160,12 @@ const PeriodActionButton = () => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
       >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="#585858" strokeWidth="2" />
+          <path d="M3 9h18M8 2v4M16 2v4" stroke="#585858" strokeWidth="2" strokeLinecap="round" />
+        </svg>
         {label}
       </button>
       {open && (
@@ -195,8 +213,11 @@ const AddWidgetActionButton = () => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-2 flex items-center gap-1.5"
       >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M12 5v14M5 12h14" stroke="#585858" strokeWidth="2" strokeLinecap="round" />
+        </svg>
         + Add widget
       </button>
       {open && (
