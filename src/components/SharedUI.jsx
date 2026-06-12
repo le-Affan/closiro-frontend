@@ -411,8 +411,22 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
               key={c}
               onClick={() => onUpdate(row.path, c)}
               className="w-6 h-6 rounded-full border-2"
-              style={{ backgroundColor: c, borderColor: getPath(config, row.path) === c ? '#585858' : 'transparent' }}
+              style={{ backgroundColor: c, borderColor: (getPath(config, row.path) ?? row.defaultValue) === c ? '#585858' : 'transparent' }}
             />
+          ))}
+        </div>
+      );
+    case 'labeledSwatch':
+      return (
+        <div className="flex gap-3">
+          {row.swatches.map((s) => (
+            <button key={s.value} onClick={() => onUpdate(row.path, s.value)} className="flex flex-col items-center gap-1">
+              <span
+                className="w-6 h-6 rounded-full border-2"
+                style={{ backgroundColor: s.value, borderColor: (getPath(config, row.path) ?? row.defaultValue) === s.value ? '#585858' : '#e0e0e0' }}
+              />
+              <span className="text-[10px] text-[#949494]">{s.label}</span>
+            </button>
           ))}
         </div>
       );
@@ -454,7 +468,7 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
         <div className="flex flex-col gap-2">
           {row.options.map((o) => (
             <label key={o.value} className="flex items-center gap-2 text-[12px] text-[#585858] cursor-pointer">
-              <input type="radio" checked={getPath(config, row.path) === o.value} onChange={() => onUpdate(row.path, o.value)} />
+              <input type="radio" checked={(getPath(config, row.path) ?? row.defaultValue) === o.value} onChange={() => onUpdate(row.path, o.value)} />
               {o.label}
             </label>
           ))}
@@ -521,7 +535,28 @@ const AGENT_STATS_GRID = `${STAT_CENTERED} [&>*:nth-child(2)>div]:!grid [&>*:nth
 
 const AGENT_PERFORMANCE_FULL = `${STAT_CENTERED} [&_.relative]:!w-[380px] [&_.relative]:!h-[380px] ${RECHARTS_FULL} [&_.text-\\[28px\\]]:!text-[64px] [&_.text-\\[28px\\]]:!font-bold [&_.text-\\[12px\\]]:!text-[16px] [&_.text-\\[12px\\]]:!text-[#949494] [&_.text-\\[13px\\]]:!text-[20px] [&_.text-\\[13px\\]]:!text-[#737373]`;
 
-const AGENT_TARGETS_BARS = `${TITLE_ROW} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-between [&_.w-36]:!text-[18px] [&_.w-24]:!text-[16px] [&_.h-2]:!h-10 [&_.bg-\\[\\#f1f1f1\\]]:!bg-[#f0f0f0] [&_.bg-\\[\\#7ed3cf\\]]:!bg-[var(--bar-fill)]`;
+const AGENT_TARGETS_BARS = `${TITLE_ROW} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-between [&_.w-36]:!text-[18px] [&_.w-24]:!text-[16px] [&_.h-2]:!h-10 [&_.bg-\\[\\#f1f1f1\\]]:!bg-[#f0f0f0]`;
+
+// ---------- text size scaling for stat-only fullscreen views ----------
+const TEXT_SIZE_CLASS = {
+  large: '[&_.stat-number]:!text-[1.35em]',
+  xl: '[&_.stat-number]:!text-[1.7em]',
+};
+
+// ---------- generic settings schema for cards with no chart config ----------
+const STAT_SETTINGS_SCHEMA = [
+  { key: 'Colors', type: 'colorSwatch', path: 'colors.primary', defaultValue: '#7ed3cf', swatches: ['#7ed3cf', '#3ca30f', '#2477e8', '#f1a013', '#1a1a1a'] },
+  { key: 'Text Size', type: 'radio', path: 'textSize', defaultValue: 'normal', options: [
+    { value: 'normal', label: 'Normal' },
+    { value: 'large', label: 'Large' },
+    { value: 'xl', label: 'Extra Large' },
+  ] },
+  { key: 'Background', type: 'labeledSwatch', path: 'background', defaultValue: '#ffffff', swatches: [
+    { value: '#ffffff', label: 'White' },
+    { value: '#f0fafb', label: 'Light teal' },
+    { value: '#f0fdf4', label: 'Light green' },
+  ] },
+];
 
 const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) => {
   const { getConfig, setConfig } = useContext(ChartConfigRegistryContext);
@@ -533,7 +568,8 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
   const config = getConfig(cardId, defaults);
   const onUpdate = (path, value) => setConfig(cardId, setPath(config, path, value));
   const isStatCentered = cardId === 'agent-stats-row' || cardId === 'agent-performance';
-  const showSettingsPanel = mode === 'settings' && !statOnly;
+  const showSettingsPanel = mode === 'settings';
+  const textSizeClass = TEXT_SIZE_CLASS[config?.textSize] || '';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -545,20 +581,20 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
         </button>
         <div className="flex flex-col" style={{ flex: 1, height: '100%', padding: isStatCentered ? 0 : 32, overflow: 'hidden' }}>
           {isStatCentered ? (
-            <div className={`flex-1 min-h-0 w-full ${cardId === 'agent-stats-row' ? AGENT_STATS_GRID : AGENT_PERFORMANCE_FULL}`}>
+            <div className={`flex-1 min-h-0 w-full ${cardId === 'agent-stats-row' ? `${AGENT_STATS_GRID} ${textSizeClass}` : AGENT_PERFORMANCE_FULL}`}>
               {children}
             </div>
           ) : statOnly ? (
             cardId === 'founder-top-performers' ? (
-              <div className={`flex flex-col flex-1 min-h-0 w-full overflow-y-auto ${TITLE_ROW} [&_td]:!py-3 [&_th]:!py-3`}>
+              <div className={`flex flex-col flex-1 min-h-0 w-full overflow-y-auto ${TITLE_ROW} [&_td]:!py-3 [&_th]:!py-3 ${textSizeClass}`}>
                 {children}
               </div>
             ) : cardId === 'agent-targets' ? (
-              <div className={`flex flex-col flex-1 min-h-0 w-full ${AGENT_TARGETS_BARS}`} style={{ '--bar-fill': config?.colors?.primary || '#7ed3cf' }}>
+              <div className={`flex flex-col flex-1 min-h-0 w-full ${AGENT_TARGETS_BARS} ${textSizeClass}`}>
                 {children}
               </div>
             ) : (
-              <div className="flex-1 min-h-0 flex flex-col items-center justify-center overflow-y-auto w-full scale-150 [&_.stat-number]:text-3xl [&_.stat-label]:text-sm">
+              <div className={`flex-1 min-h-0 flex flex-col items-center justify-center overflow-y-auto w-full scale-150 [&_.stat-number]:text-3xl [&_.stat-label]:text-sm ${textSizeClass}`}>
                 {children}
               </div>
             )
@@ -568,11 +604,11 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
             </div>
           )}
         </div>
-        {mode === 'settings' && !statOnly && (
+        {showSettingsPanel && (
           <div className="border-l border-[#e0e0e0] p-6 overflow-y-auto" style={{ width: 300, flexShrink: 0 }}>
             <h4 className="text-[15px] font-semibold text-[#1a1a1a] mb-3">Widget settings</h4>
-            {schema ? (
-              schema.map((row) => (
+            {(schema || (!CHART_CARD_IDS.includes(cardId) ? STAT_SETTINGS_SCHEMA : null)) ? (
+              (schema || STAT_SETTINGS_SCHEMA).map((row) => (
                 <AccordionRow
                   key={row.key}
                   label={row.key}
@@ -595,6 +631,8 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
 };
 
 export const Card = ({ children, className = '', cardId, data, hasChart, onRemove }) => {
+  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const config = getConfig(cardId, CHART_DEFAULTS[cardId] || {});
   const [modalMode, setModalMode] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [removed, setRemoved] = useState(false);
@@ -624,7 +662,7 @@ export const Card = ({ children, className = '', cardId, data, hasChart, onRemov
     <>
       <CardIdContext.Provider value={cardId}>
         <CardContext.Provider value={ctx}>
-          <div className={`relative group bg-white border border-[#e8e8e8] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-150 p-5 ${className}`}>
+          <div className={`relative group bg-white border border-[#e8e8e8] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-150 p-5 ${className}`} style={config.background ? { backgroundColor: config.background } : undefined}>
             <div data-drag-handle="true" className="absolute top-2 left-2 text-[#bebebe] hover:text-[#737373] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab select-none">⠿</div>
             {children}
 
@@ -695,24 +733,24 @@ export const Sparkle = () => (
 );
 
 // ---------- Sales Agent visualisation helpers ----------
-export const RadialGauge = ({ pct, display, label, size = 88 }) => (
+export const RadialGauge = ({ pct, display, label, size = 88, color }) => (
   <div className="flex flex-col items-center gap-2">
     <div className="relative" style={{ width: size, height: size }}>
       <ResponsiveContainer width="100%" height="100%">
         <RadialBarChart data={[{ value: pct }]} startAngle={90} endAngle={-270} innerRadius="75%" outerRadius="100%" barSize={8}>
           <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
-          <RadialBar dataKey="value" cornerRadius={8} fill="#7ed3cf" background={{ fill: '#f1f1f1' }} />
+          <RadialBar dataKey="value" cornerRadius={8} fill={color || '#7ed3cf'} background={{ fill: '#f1f1f1' }} />
         </RadialBarChart>
       </ResponsiveContainer>
-      <div className="absolute inset-0 flex items-center justify-center text-[13px] font-semibold text-[#585858] text-center px-1">
+      <div className="absolute inset-0 flex items-center justify-center text-[13px] font-semibold text-[#585858] text-center px-1 stat-number" style={color ? { color } : undefined}>
         {display}
       </div>
     </div>
-    <span className="text-[11px] text-[#949494]">{label}</span>
+    <span className="text-[11px] text-[#949494] stat-label">{label}</span>
   </div>
 );
 
-export const AnimatedProgressBar = ({ label, current, target, pct }) => {
+export const AnimatedProgressBar = ({ label, current, target, pct, color }) => {
   const [width, setWidth] = useState(0);
   useEffect(() => {
     const t = setTimeout(() => setWidth(pct), 100);
@@ -720,11 +758,11 @@ export const AnimatedProgressBar = ({ label, current, target, pct }) => {
   }, [pct]);
   return (
     <div className="flex items-center gap-4">
-      <span className="text-[12px] text-[#585858] w-36 shrink-0">{label}</span>
+      <span className="text-[12px] text-[#585858] w-36 shrink-0 stat-label">{label}</span>
       <div className="flex-1 h-2 bg-[#f1f1f1] rounded-full overflow-hidden">
-        <div className="h-full bg-[#7ed3cf] rounded-full transition-all duration-1000" style={{ width: `${width}%` }} />
+        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${width}%`, backgroundColor: color || '#7ed3cf' }} />
       </div>
-      <span className="text-[12px] text-[#949494] w-24 text-right shrink-0">{current} / {target}</span>
+      <span className="text-[12px] text-[#949494] w-24 text-right shrink-0 stat-number" style={color ? { color } : undefined}>{current} / {target}</span>
     </div>
   );
 };
@@ -752,7 +790,7 @@ export const scoreBadgeClass = (score) => {
   return 'bg-[#fbe7e5] text-[#de3226]';
 };
 
-export const PerformersTable = ({ data }) => (
+export const PerformersTable = ({ data, color }) => (
   <table className="w-full text-[12px] border-collapse">
     <thead>
       <tr className="text-left text-[#949494]">
@@ -767,7 +805,7 @@ export const PerformersTable = ({ data }) => (
         <tr key={rep.name} className={i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}>
           <td className="py-2 px-3 text-[#585858] border-b border-[#e0e0e0]">{rep.name}</td>
           <td className="py-2 px-3 border-b border-[#e0e0e0]">
-            <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${scoreBadgeClass(rep.score)}`}>{rep.score}%</span>
+            <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium stat-number ${scoreBadgeClass(rep.score)}`} style={color ? { color } : undefined}>{rep.score}%</span>
           </td>
           <td className="py-2 px-3 text-[#585858] border-b border-[#e0e0e0]">{rep.calls}</td>
           <td className="py-2 px-3 text-[#585858] border-b border-[#e0e0e0]">{rep.conversion}</td>

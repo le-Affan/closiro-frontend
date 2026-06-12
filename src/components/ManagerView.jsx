@@ -126,6 +126,8 @@ const RepPerformanceList = ({ reps }) => {
 };
 
 const ManagerView = () => {
+  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const kpiColor = getConfig('manager-kpi-pills', {}).colors?.primary;
   const [searchQuery, setSearchQuery] = useState('');
   const [period, setPeriod] = useState('');
   const [filters, setFilters] = useState([]);
@@ -170,8 +172,8 @@ const ManagerView = () => {
               <div key={kpi.label} className="flex items-center gap-2">
                 <DownArrow color={kpi.color} />
                 <div>
-                  <div className="text-[11px] text-[#949494]">{kpi.label}</div>
-                  <div className="text-[15px] font-semibold text-[#585858]">{kpi.value}</div>
+                  <div className="text-[11px] text-[#949494] stat-label">{kpi.label}</div>
+                  <div className="text-[15px] font-semibold text-[#585858] stat-number" style={kpiColor ? { color: kpiColor } : undefined}>{kpi.value}</div>
                 </div>
               </div>
             ))}

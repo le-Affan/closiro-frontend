@@ -54,6 +54,10 @@ const MyPipelineChart = () => {
 };
 
 const AgentView = () => {
+  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const statsColor = getConfig('agent-stats-row', {}).colors?.primary;
+  const targetsColor = getConfig('agent-targets', {}).colors?.primary;
+
   const pipelineTableData = {
     columns: ['Stage', 'Count'],
     rows: myPipelineData.map((d) => [d.name, d.value]),
@@ -70,7 +74,7 @@ const AgentView = () => {
         <CardHeader title="My Stats" />
         <div className="flex items-center justify-around">
           {agentStats.map((s) => (
-            <RadialGauge key={s.label} pct={s.pct} display={s.display} label={s.label} />
+            <RadialGauge key={s.label} pct={s.pct} display={s.display} label={s.label} color={statsColor} />
           ))}
         </div>
       </Card>
@@ -80,7 +84,7 @@ const AgentView = () => {
         <CardHeader title="Personal Targets" />
         <div className="flex flex-col gap-4">
           {personalTargets.map((t) => (
-            <AnimatedProgressBar key={t.label} label={t.label} current={t.current} target={t.target} pct={t.pct} />
+            <AnimatedProgressBar key={t.label} label={t.label} current={t.current} target={t.target} pct={t.pct} color={targetsColor} />
           ))}
         </div>
       </Card>

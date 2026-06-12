@@ -188,6 +188,10 @@ const PipelineChart = () => {
 };
 
 const FounderView = () => {
+  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const kpiColor = getConfig('founder-kpi-pills', {}).colors?.primary;
+  const performersColor = getConfig('founder-top-performers', {}).colors?.primary;
+
   const annualTableData = {
     columns: ['Metric', 'Value'],
     rows: [['Current', '62K'], ['Target', '100K'], ['AI Potential', '150K']],
@@ -221,8 +225,8 @@ const FounderView = () => {
             <div key={kpi.label} className="flex items-center gap-2">
               <DownArrow color={kpi.color} />
               <div>
-                <div className="text-[11px] text-[#949494]">{kpi.label}</div>
-                <div className="text-[15px] font-semibold text-[#585858]">{kpi.value}</div>
+                <div className="text-[11px] text-[#949494] stat-label">{kpi.label}</div>
+                <div className="text-[15px] font-semibold text-[#585858] stat-number" style={kpiColor ? { color: kpiColor } : undefined}>{kpi.value}</div>
               </div>
             </div>
           ))}
@@ -291,7 +295,7 @@ const FounderView = () => {
     performers: (
       <Card cardId="founder-top-performers">
         <CardHeader title="Top Performers" />
-        <PerformersTable data={repPerformanceTable} />
+        <PerformersTable data={repPerformanceTable} color={performersColor} />
       </Card>
     ),
   };
