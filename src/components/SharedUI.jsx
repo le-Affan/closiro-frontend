@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useContext, createContext } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
 } from 'recharts';
@@ -599,7 +600,7 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
   const showSettingsPanel = mode === 'settings';
   const textSizeClass = TEXT_SIZE_CLASS[config?.textSize] || '';
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="relative bg-white rounded-xl shadow-lg flex flex-row overflow-hidden" style={{ width: '95vw', height: isStatCentered && !showSettingsPanel ? '85vh' : '92vh' }}>
         <button onClick={onClose} className="absolute top-3 right-3 z-10 flex items-center justify-center" aria-label="Close">
@@ -654,7 +655,8 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
