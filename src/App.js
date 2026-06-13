@@ -22,19 +22,25 @@ function App() {
       <div className="w-full overflow-x-hidden flex tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
         <ProfileSwitcher selectedProfile={selectedProfile} setSelectedProfile={setSelectedProfile} />
         <Sidebar />
-        <SecondSidebar />
 
-        {/* Main content */}
-        <div className="flex-1 bg-white flex flex-col">
+        {/* Header + (Sidenav_two + content) */}
+        <div className="flex-1 flex flex-col">
           <TopBar />
 
-          {/* Page content */}
-          <div className="p-6 flex flex-col gap-5 overflow-y-auto">
-            <PageHeader selectedProfile={selectedProfile} />
+          <div className="flex-1 flex">
+            <SecondSidebar />
 
-            {isAgent && <AgentView />}
-            {isManager && <ManagerView />}
-            {isAdmin && <FounderView />}
+            {/* Main content */}
+            <div className="flex-1 bg-white flex flex-col">
+              {/* Page content */}
+              <div className="p-6 flex flex-col gap-5 overflow-y-auto">
+                <PageHeader selectedProfile={selectedProfile} />
+
+                {isAgent && <AgentView />}
+                {isManager && <ManagerView />}
+                {isAdmin && <FounderView />}
+              </div>
+            </div>
           </div>
         </div>
       </div>
