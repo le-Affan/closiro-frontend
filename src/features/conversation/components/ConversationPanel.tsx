@@ -58,7 +58,7 @@ export function ConversationPanel({ children }: ConversationPanelProps) {
       </div>
 
       <ChatComposer 
-        onSendMessage={(msg) => console.log('Sending msg:', msg)} 
+        onSendMessage={(msg) => {}}
         placeholder="New message as Billing" 
       />
     </div>
