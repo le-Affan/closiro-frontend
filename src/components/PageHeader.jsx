@@ -1,5 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
+import AutoFixNormalOutlinedIcon from '@mui/icons-material/AutoFixNormalOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import DateRangeOutlinedIcon from '@mui/icons-material/DateRangeOutlined';
+import AddIcon from '@mui/icons-material/Add';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { DownArrow } from './SharedUI';
+
+const TOOLBAR_BTN_STYLE = {
+  padding: '4px 5px',
+  borderRadius: 4,
+  border: 'none',
+  background: 'transparent',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  fontFamily: 'Inter',
+  fontSize: 14,
+  fontWeight: 500,
+  color: '#585858',
+};
 
 const PROFILE_CARDS = {
   'Sales Agent': ['My Stats', 'Personal Targets', 'My Pipeline', 'My Performance'],
@@ -44,13 +64,21 @@ const GenerateReportButton = ({ selectedProfile }) => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="bg-[#5bc4bf] hover:bg-[#4aada8] text-white text-[12px] font-medium rounded-sm px-4 py-2 flex items-center gap-2 transition-colors duration-150"
+        style={{
+          padding: '6px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: 4,
+          border: '1px solid #8ae8e4',
+          background: 'linear-gradient(92deg, #8ae8e4 -2.05%, #b1f8c5 104.42%)',
+        }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M12 20h9" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        Generate report
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <AutoFixNormalOutlinedIcon sx={{ fontSize: 20 }} style={{ color: '#000000' }} />
+          <span style={{ fontFamily: 'Inter', color: '#000000', fontSize: 12, fontWeight: 500 }}>Generate report</span>
+        </div>
       </button>
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9998]">
@@ -164,14 +192,8 @@ const SearchActionButton = ({ query, setQuery }) => {
   }
 
   return (
-    <button
-      onClick={() => setOpen(true)}
-      className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 flex items-center gap-2 hover:bg-[#f4f6f8] transition-colors duration-150"
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="11" cy="11" r="7" stroke="#585858" strokeWidth="2.5" />
-        <path d="M21 21l-4-4" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" />
-      </svg>
+    <button onClick={() => setOpen(true)} style={TOOLBAR_BTN_STYLE}>
+      <SearchIcon sx={{ fontSize: 18 }} style={{ color: '#585858' }} />
       Search
     </button>
   );
@@ -205,16 +227,8 @@ const FiltersActionButton = () => {
 
   return (
     <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 flex items-center gap-2 hover:bg-[#f4f6f8] transition-colors duration-150"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M4 6h16M8 6v0M4 12h16M14 12v0M4 18h16M10 18v0" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="8" cy="6" r="2" fill="#585858" />
-          <circle cx="14" cy="12" r="2" fill="#585858" />
-          <circle cx="10" cy="18" r="2" fill="#585858" />
-        </svg>
+      <button onClick={() => setOpen((o) => !o)} style={TOOLBAR_BTN_STYLE}>
+        <FilterListIcon sx={{ fontSize: 18 }} style={{ color: '#585858' }} />
         Filters
         {activeCount > 0 && (
           <span className="bg-[#7ed3cf] text-white text-[10px] font-semibold rounded-full w-4 h-4 flex items-center justify-center">
@@ -257,14 +271,8 @@ const PeriodActionButton = () => {
 
   return (
     <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 flex items-center gap-2 hover:bg-[#f4f6f8] transition-colors duration-150"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="4" width="18" height="18" rx="2" stroke="#585858" strokeWidth="2.5" />
-          <path d="M3 9h18M8 2v4M16 2v4" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" />
-        </svg>
+      <button onClick={() => setOpen((o) => !o)} style={TOOLBAR_BTN_STYLE}>
+        <DateRangeOutlinedIcon sx={{ fontSize: 18 }} style={{ color: '#585858' }} />
         {label}
       </button>
       {open && (
@@ -331,14 +339,9 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 flex items-center gap-2 hover:bg-[#f4f6f8] transition-colors duration-150"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M12 5v14M5 12h14" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" />
-        </svg>
-        + Add widget
+      <button onClick={() => setOpen(true)} style={TOOLBAR_BTN_STYLE}>
+        <AddIcon sx={{ fontSize: 18 }} style={{ color: '#585858' }} />
+        Add widget
       </button>
       {open && (
         <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)}>
@@ -385,7 +388,9 @@ const PageHeader = ({ selectedProfile }) => {
     <>
       {/* Header */}
       <div>
-        <h1 className="text-[20px] font-semibold text-[#585858]">Information</h1>
+        <div style={{ width: 1120, height: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'stretch', gap: 8 }}>
+          <h1 style={{ fontFamily: 'Inter', fontSize: 24, fontWeight: 600, color: '#000000' }}>Information</h1>
+        </div>
         <p className="text-[13px] text-[#737373] mt-1">
           Clear performance summaries to understand call activity, outcomes, and trends at a glance.
         </p>
@@ -395,13 +400,18 @@ const PageHeader = ({ selectedProfile }) => {
       </div>
 
       {/* Action bar */}
-      <div className="flex items-center gap-2">
-        <GenerateReportButton selectedProfile={selectedProfile} />
-        <div className="w-px h-5 bg-[#e0e0e0] mx-2" />
-        <SearchActionButton query={searchQuery} setQuery={setSearchQuery} />
-        <FiltersActionButton />
-        <PeriodActionButton />
-        <AddWidgetActionButton selectedProfile={selectedProfile} />
+      <div style={{ padding: '20px 20px 24px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'stretch' }}>
+        <div className="flex items-center gap-2">
+          <GenerateReportButton selectedProfile={selectedProfile} />
+          <div className="w-px h-5 bg-[#e0e0e0] mx-2" />
+          <SearchActionButton query={searchQuery} setQuery={setSearchQuery} />
+          <FiltersActionButton />
+          <PeriodActionButton />
+          <AddWidgetActionButton selectedProfile={selectedProfile} />
+        </div>
+        <button style={{ border: 'none', background: 'transparent', padding: '4px 5px', borderRadius: 4, display: 'flex', alignItems: 'center' }}>
+          <SettingsOutlinedIcon sx={{ fontSize: 20 }} style={{ color: '#585858' }} />
+        </button>
       </div>
 
       {searchQuery && (
