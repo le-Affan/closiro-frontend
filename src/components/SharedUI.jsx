@@ -262,7 +262,7 @@ const SWATCH_SET = ['#7ed3cf', '#2477e8', '#80cc60', '#f1a013', '#de3226'];
 export const CHART_DEFAULTS = {
   'manager-call-trend': {
     chartType: 'area',
-    colors: { total: '#2477e8', connected: '#80cc60', missed: '#de3226', followups: '#f1a013' },
+    colors: { total: '#2883ff', connected: '#42b311', missed: '#f4372a', followups: '#f1a013' },
     showGrid: true,
     showLegend: true,
   },
