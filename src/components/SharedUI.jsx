@@ -600,7 +600,7 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-      <div className="relative bg-white rounded-xl shadow-lg flex flex-row overflow-hidden" style={{ width: '95vw', height: isStatCentered && !showSettingsPanel ? '85vh' : '92vh' }}>
+      <div className="relative bg-white border border-[#e0e0e0] rounded-xl shadow-none flex flex-row overflow-hidden" style={{ width: '95vw', height: isStatCentered && !showSettingsPanel ? '85vh' : '92vh' }}>
         <button onClick={onClose} className="absolute top-3 right-3 z-10 flex items-center justify-center" aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M6 6L18 18M18 6L6 18" stroke="#3a3a3a" strokeWidth="3" strokeLinecap="round" />
@@ -716,7 +716,7 @@ export const Card = ({ children, className = '', cardId, title, data, hasChart, 
   return (
     <CardIdContext.Provider value={cardId}>
       <CardContext.Provider value={ctx}>
-        <div className={`relative group bg-white border border-[#e8e8e8] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-150 p-5 h-full overflow-hidden flex flex-col ${className}`} style={config.background ? { backgroundColor: config.background } : undefined}>
+        <div className={`relative group bg-white border border-[#e0e0e0] rounded-xl shadow-none p-5 h-full overflow-hidden flex flex-col ${className}`} style={config.background ? { backgroundColor: config.background } : undefined}>
           <div className="drag-handle absolute top-2 left-2 text-[#bebebe] hover:text-[#737373] text-[14px] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing select-none">⠿</div>
           {children}
 
