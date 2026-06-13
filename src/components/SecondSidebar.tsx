@@ -3,7 +3,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import DatasetOutlinedIcon from '@mui/icons-material/DatasetOutlined';
 import RingVolumeOutlinedIcon from '@mui/icons-material/RingVolumeOutlined';
 
-const NAV2_ITEMS = [
+const NAV2_ITEMS: any[] = [
   { label: 'Live', icon: RingVolumeOutlinedIcon },
   { label: 'Data', icon: DatasetOutlinedIcon },
   { label: 'Information', icon: InfoOutlinedIcon, active: true },

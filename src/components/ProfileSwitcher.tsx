@@ -1,5 +1,10 @@
+interface ProfileSwitcherProps {
+  selectedProfile: string;
+  setSelectedProfile: (profile: string) => void;
+}
+
 // ---------- profile switcher (self-contained, delete this block to remove) ----------
-const ProfileSwitcher = ({ selectedProfile, setSelectedProfile }) => (
+const ProfileSwitcher = ({ selectedProfile, setSelectedProfile }: ProfileSwitcherProps) => (
   <div className="fixed top-3 right-3" style={{ zIndex: 9999 }}>
     <select
       value={selectedProfile}

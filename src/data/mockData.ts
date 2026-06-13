@@ -1,5 +1,13 @@
 // ---------- shared mock data ----------
-export const trendData = [
+export interface TrendDatum {
+  month: string;
+  connected: number;
+  followups: number;
+  missed: number;
+  calls: number;
+}
+
+export const trendData: TrendDatum[] = [
   { month: 'Jan', connected: 70, followups: 20, missed: 30, calls: 40 },
   { month: 'Feb', connected: 65, followups: 25, missed: 35, calls: 45 },
   { month: 'Mar', connected: 75, followups: 20, missed: 40, calls: 50 },
@@ -14,7 +22,12 @@ export const trendData = [
   { month: 'Dec', connected: 100, followups: 25, missed: 30, calls: 100 },
 ];
 
-export const leadSourceData = [
+export interface NameValueDatum {
+  name: string;
+  value: number;
+}
+
+export const leadSourceData: NameValueDatum[] = [
   { name: 'Inbound', value: 45 },
   { name: 'Outbound', value: 30 },
   { name: 'Referral', value: 10 },
@@ -24,7 +37,13 @@ export const leadSourceData = [
   { name: 'Social Media', value: 30 },
 ];
 
-export const repData = [
+export interface RepDatum {
+  name: string;
+  score: number;
+  color: string;
+}
+
+export const repData: RepDatum[] = [
   { name: 'Isabella Wilson', score: 80, color: '#3ca30f' },
   { name: 'Ava Chen', score: 80, color: '#3ca30f' },
   { name: 'Liam Johnson', score: 73, color: '#3ca30f' },
@@ -35,7 +54,7 @@ export const repData = [
   { name: 'Olivia Brown', score: 20, color: '#de3226' },
 ];
 
-export const pipelineData = [
+export const pipelineData: NameValueDatum[] = [
   { name: 'New', value: 20 },
   { name: 'Discovery', value: 18 },
   { name: 'Proposal', value: 14 },
@@ -43,11 +62,24 @@ export const pipelineData = [
   { name: 'Won', value: 7 },
 ];
 
-export const monthlyRevenueData = [
+export interface MonthlyRevenueDatum {
+  name: string;
+  a: number;
+  b: number;
+  c: number;
+}
+
+export const monthlyRevenueData: MonthlyRevenueDatum[] = [
   { name: 'rev', a: 5000, b: 3000, c: 2000 },
 ];
 
-export const kpis = [
+export interface KpiDatum {
+  label: string;
+  value: string;
+  color: string;
+}
+
+export const kpis: KpiDatum[] = [
   { label: 'Total Calls', value: '1209', color: '#2477e8' },
   { label: 'Connected Calls', value: '842', color: '#3ca30f' },
   { label: 'Missed Calls', value: '198', color: '#de3226' },
@@ -56,20 +88,33 @@ export const kpis = [
 ];
 
 // ---------- profile-scoped mock data (Sales Agent) ----------
-export const agentStats = [
+export interface AgentStatDatum {
+  label: string;
+  display: string;
+  pct: number;
+}
+
+export const agentStats: AgentStatDatum[] = [
   { label: 'Calls Today', display: '21 / 25', pct: 84 },
   { label: 'Conversion Rate', display: '14%', pct: 78 },
   { label: 'Pipeline Deals', display: '4', pct: 40 },
   { label: 'Rank', display: '#2 of 8', pct: 88 },
 ];
 
-export const personalTargets = [
+export interface PersonalTargetDatum {
+  label: string;
+  current: string;
+  target: string;
+  pct: number;
+}
+
+export const personalTargets: PersonalTargetDatum[] = [
   { label: 'Calls/Day', current: '21', target: '25', pct: 84 },
   { label: 'Conversion Rate', current: '14%', target: '18%', pct: 78 },
   { label: 'Monthly Revenue', current: '5K', target: '8K', pct: 63 },
 ];
 
-export const myPipelineData = [
+export const myPipelineData: NameValueDatum[] = [
   { name: 'New', value: 3 },
   { name: 'Discovery', value: 2 },
   { name: 'Proposal', value: 2 },
@@ -78,7 +123,7 @@ export const myPipelineData = [
 ];
 
 // ---------- profile-scoped mock data (Admin/Founder) ----------
-export const adminKpis = [
+export const adminKpis: KpiDatum[] = [
   { label: 'Total Calls', value: '1209', color: '#2477e8' },
   { label: 'Connected Calls', value: '842', color: '#3ca30f' },
   { label: 'Revenue This Month', value: '62K', color: '#62a5a2' },
@@ -86,7 +131,14 @@ export const adminKpis = [
   { label: 'Conversion Signal', value: '24', color: '#62a5a2' },
 ];
 
-export const repPerformanceTable = [
+export interface RepPerformanceDatum {
+  name: string;
+  score: number;
+  calls: number;
+  conversion: string;
+}
+
+export const repPerformanceTable: RepPerformanceDatum[] = [
   { name: 'Isabella Wilson', score: 80, calls: 142, conversion: '32%' },
   { name: 'Ava Chen', score: 80, calls: 138, conversion: '31%' },
   { name: 'Liam Johnson', score: 73, calls: 120, conversion: '28%' },
