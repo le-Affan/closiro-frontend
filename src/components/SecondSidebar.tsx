@@ -2,15 +2,19 @@ import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import DatasetOutlinedIcon from '@mui/icons-material/DatasetOutlined';
 import RingVolumeOutlinedIcon from '@mui/icons-material/RingVolumeOutlined';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NAV2_ITEMS: any[] = [
-  { label: 'Live', icon: RingVolumeOutlinedIcon },
-  { label: 'Data', icon: DatasetOutlinedIcon },
-  { label: 'Information', icon: InfoOutlinedIcon, active: true },
-  { label: 'Insights', icon: BarChartOutlinedIcon },
+  { label: 'Live', icon: RingVolumeOutlinedIcon, to: '/live' },
+  { label: 'Data', icon: DatasetOutlinedIcon, to: '/' },
+  { label: 'Information', icon: InfoOutlinedIcon, to: '/' },
+  { label: 'Insights', icon: BarChartOutlinedIcon, to: '/' },
 ];
 
-const SecondSidebar = () => (
+const SecondSidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  return (
   <div
     className="shrink-0"
     style={{
@@ -26,10 +30,12 @@ const SecondSidebar = () => (
   >
     {NAV2_ITEMS.map((item) => {
       const Icon = item.icon;
-      const color = item.active ? '#4c807d' : '#737373';
+      const active = location.pathname === item.to;
+      const color = active ? '#4c807d' : '#737373';
       return (
         <div
           key={item.label}
+          onClick={() => navigate(item.to)}
           className="cursor-pointer transition-colors duration-150 rounded"
           style={{
             width: 208,
@@ -38,7 +44,7 @@ const SecondSidebar = () => (
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            background: item.active ? '#dbf8f7' : 'transparent',
+            background: active ? '#dbf8f7' : 'transparent',
           }}
         >
           <Icon sx={{ fontSize: 24, width: 24, height: 24, flexShrink: 0 }} style={{ color }} />
@@ -47,6 +53,7 @@ const SecondSidebar = () => (
       );
     })}
   </div>
-);
+  );
+};
 
 export default SecondSidebar;

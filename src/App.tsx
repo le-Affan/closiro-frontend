@@ -1,50 +1,34 @@
-import { useState } from 'react';
-import ProfileSwitcher from './components/ProfileSwitcher';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import SecondSidebar from './components/SecondSidebar';
 import TopBar from './components/TopBar';
-import PageHeader from './components/PageHeader';
-import AgentView from './components/AgentView';
-import ManagerView from './components/ManagerView';
-import FounderView from './components/FounderView';
-import { ChartConfigRegistryProvider } from './components/SharedUI';
+import DashboardPage from './pages/DashboardPage';
+import LivePage from './pages/LivePage';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 function App() {
-  const [selectedProfile, setSelectedProfile] = useState('Sales Manager');
-  const isAgent = selectedProfile === 'Sales Agent';
-  const isAdmin = selectedProfile === 'Admin/Founder';
-  const isManager = selectedProfile === 'Sales Manager';
-
   return (
-    <ChartConfigRegistryProvider>
-      <div className="w-full overflow-x-hidden flex tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
-        <ProfileSwitcher selectedProfile={selectedProfile} setSelectedProfile={setSelectedProfile} />
+    <BrowserRouter>
+      <div
+        className="flex h-screen overflow-hidden tracking-tight"
+        style={{ fontFamily: 'Inter, sans-serif' }}
+      >
         <Sidebar />
-
-        {/* Header + (Sidenav_two + content) */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex flex-col flex-1">
           <TopBar />
-
-          <div className="flex-1 flex">
+          <div className="flex flex-1 overflow-hidden">
             <SecondSidebar />
-
-            {/* Main content */}
-            <div className="flex-1 bg-white flex flex-col">
-              {/* Page content */}
-              <div className="p-6 flex flex-col gap-5 overflow-y-auto">
-                <PageHeader selectedProfile={selectedProfile} />
-
-                {isAgent && <AgentView />}
-                {isManager && <ManagerView />}
-                {isAdmin && <FounderView />}
-              </div>
-            </div>
+            <main className="flex-1 overflow-auto bg-white">
+              <Routes>
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/live" element={<LivePage />} />
+              </Routes>
+            </main>
           </div>
         </div>
       </div>
-    </ChartConfigRegistryProvider>
+    </BrowserRouter>
   );
 }
 
