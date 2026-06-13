@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useContext, createContext, Children } from 'react';
 import { createPortal } from 'react-dom';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
 } from 'recharts';
@@ -182,14 +183,13 @@ export const CardHeader = ({ title }) => {
           onChange={(e) => setName(e.target.value)}
           onBlur={() => setRenaming(false)}
           onKeyDown={(e) => e.key === 'Enter' && setRenaming(false)}
-          className="text-[15px] font-semibold text-[#1a1a1a] border border-[#e0e0e0] rounded px-1 outline-none"
+          className="font-semibold text-[#000000] border border-[#e0e0e0] rounded px-1 outline-none"
+          style={{ fontFamily: 'Inter', fontSize: 18, lineHeight: '120%', letterSpacing: '-0.09px' }}
         />
       ) : (
-        <div className="flex items-center gap-2">
-          <h3 className="text-[15px] font-semibold text-[#1a1a1a]">{name}</h3>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+        <div className="flex items-center" style={{ gap: 12 }}>
+          <h3 className="font-semibold text-[#000000]" style={{ fontFamily: 'Inter', fontSize: 18, lineHeight: '120%', letterSpacing: '-0.09px' }}>{name}</h3>
+          <FilterListIcon sx={{ fontSize: 20 }} style={{ color: '#737373' }} />
         </div>
       )}
       <CardMenu onAction={handleAction} />

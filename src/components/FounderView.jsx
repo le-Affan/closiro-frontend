@@ -4,6 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList,
 } from 'recharts';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import { Card, CardHeader, ConnectedCardMenu, Sparkle, PerformersTable, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { adminKpis, pipelineData, monthlyRevenueData, repPerformanceTable } from '../data/mockData';
 
@@ -310,11 +311,9 @@ const FounderView = () => {
     'founder-monthly-revenue': (
       <Card cardId="founder-monthly-revenue" title="Monthly Revenue Target" data={monthlyTableData} hasChart onDuplicate={handleDuplicate}>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <div className="flex items-center" style={{ gap: 12 }}>
+            <h3 className="font-semibold text-[#000000]" style={{ fontFamily: 'Inter', fontSize: 18, lineHeight: '120%', letterSpacing: '-0.09px' }}>Monthly Revenue Target</h3>
+            <FilterListIcon sx={{ fontSize: 20 }} style={{ color: '#737373' }} />
           </div>
           <div className="flex items-center gap-3">
             <button className="text-[11px] font-medium text-[#585858] border border-[#e0e0e0] rounded-lg px-3 py-1.5 hover:bg-[#f4f6f8] transition-colors duration-150">
