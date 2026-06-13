@@ -838,10 +838,17 @@ export const PerformersTable = ({ data, color }) => (
 );
 
 // ---------- sidebar icon ----------
-export const SidebarIcon = ({ d, active }) => (
-  <div className={`w-9 h-9 flex items-center justify-center rounded-lg cursor-pointer transition-colors duration-150 ${active ? 'bg-[#dbf8f7]' : 'hover:bg-white/20'}`}>
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path d={d} stroke={active ? '#4c807d' : '#ffffff'} strokeWidth="2.5" strokeOpacity={active ? 1 : 0.85} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+export const SidebarIcon = ({ icon: Icon, active }) => (
+  <div
+    className="flex flex-col justify-center items-center cursor-pointer transition-colors duration-150"
+    style={{
+      width: 40,
+      height: 40,
+      padding: 8,
+      borderRadius: 100,
+      background: active ? '#dbf8f7' : 'transparent',
+    }}
+  >
+    <Icon sx={{ fontSize: 24 }} style={{ color: active ? '#62a5a2' : '#000000' }} />
   </div>
 );
