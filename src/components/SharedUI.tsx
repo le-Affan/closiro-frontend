@@ -1,13 +1,18 @@
+import type React from 'react';
 import { useState, useEffect, useRef, useContext, createContext, Children } from 'react';
 import { createPortal } from 'react-dom';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {
-  ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
+  ResponsiveContainer, RadialBarChart, RadialBar as RadialBarRaw, PolarAngleAxis,
 } from 'recharts';
-import { ResponsiveGridLayout, useContainerWidth } from 'react-grid-layout';
+
+const RadialBar: any = RadialBarRaw;
+import { ResponsiveGridLayout as ResponsiveGridLayoutRaw, useContainerWidth } from 'react-grid-layout';
+
+const ResponsiveGridLayout: any = ResponsiveGridLayoutRaw;
 
 // ---------- shared grid layout wrapper ----------
-export const DashboardGrid = ({ layouts, onLayoutChange, children }) => {
+export const DashboardGrid = ({ layouts, onLayoutChange, children }: any) => {
   const { width, containerRef, mounted } = useContainerWidth({ measureBeforeMount: true });
   return (
     <div ref={containerRef}>
@@ -34,7 +39,7 @@ export const DashboardGrid = ({ layouts, onLayoutChange, children }) => {
 };
 
 // ---------- small UI helpers ----------
-export const DownArrow = ({ color }) => (
+export const DownArrow = ({ color }: any) => (
   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
     <path d="M5 1V9M5 9L1.5 5.5M5 9L8.5 5.5" stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
@@ -48,7 +53,7 @@ export const DotsIcon = () => (
   </svg>
 );
 
-const ChevronDown = ({ open }) => (
+const ChevronDown = ({ open }: any) => (
   <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
     <path d="M2 3.5L5 6.5L8 3.5" stroke="#949494" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
@@ -108,12 +113,12 @@ const MENU_ITEMS = [
   { label: 'Delete', icon: TrashIcon },
 ];
 
-export const CardMenu = ({ onAction }) => {
+export const CardMenu = ({ onAction }: any) => {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<any>(null);
 
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const handler = (e: any) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
@@ -141,14 +146,14 @@ export const CardMenu = ({ onAction }) => {
   );
 };
 
-const CardContext = createContext(null);
+const CardContext = createContext<any>(null);
 
-export const CardHeader = ({ title }) => {
+export const CardHeader = ({ title }: any) => {
   const ctx = useContext(CardContext);
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(title);
 
-  const handleAction = (action) => {
+  const handleAction = (action: any) => {
     switch (action) {
       case 'Full screen':
         ctx?.openModal('fullscreen');
@@ -201,7 +206,7 @@ export const CardHeader = ({ title }) => {
 export const ConnectedCardMenu = () => {
   const ctx = useContext(CardContext);
 
-  const handleAction = (action) => {
+  const handleAction = (action: any) => {
     switch (action) {
       case 'Full screen':
         ctx?.openModal('fullscreen');
@@ -228,15 +233,15 @@ export const ConnectedCardMenu = () => {
 };
 
 // ---------- persistent chart config registry (survives modal close) ----------
-export const ChartConfigRegistryContext = createContext(null);
-export const CardIdContext = createContext(null);
+export const ChartConfigRegistryContext: React.Context<any> = createContext(null);
+export const CardIdContext: React.Context<any> = createContext(null);
 
-export const ChartConfigRegistryProvider = ({ children }) => {
-  const registry = useRef({});
+export const ChartConfigRegistryProvider = ({ children }: any) => {
+  const registry = useRef<any>({});
   const [, bump] = useState(0);
 
-  const getConfig = (cardId, defaults) => registry.current[cardId] ?? defaults;
-  const setConfig = (cardId, nextConfig) => {
+  const getConfig = (cardId: any, defaults: any) => registry.current[cardId] ?? defaults;
+  const setConfig = (cardId: any, nextConfig: any) => {
     registry.current[cardId] = nextConfig;
     bump((n) => n + 1);
   };
@@ -248,9 +253,9 @@ export const ChartConfigRegistryProvider = ({ children }) => {
   );
 };
 
-const getPath = (obj, path) => path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+const getPath = (obj: any, path: string, value?: any): any => path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
 
-const setPath = (obj, path, value) => {
+const setPath = (obj: any, path: string, value?: any): any => {
   const [head, ...rest] = path.split('.');
   if (rest.length === 0) return { ...obj, [head]: value };
   return { ...obj, [head]: setPath(obj[head] ?? {}, rest.join('.'), value) };
@@ -259,7 +264,7 @@ const setPath = (obj, path, value) => {
 // ---------- per-card chart config defaults ----------
 const SWATCH_SET = ['#7ed3cf', '#2477e8', '#80cc60', '#f1a013', '#de3226'];
 
-export const CHART_DEFAULTS = {
+export const CHART_DEFAULTS: Record<string, any> = {
   'manager-call-trend': {
     chartType: 'area',
     colors: { total: '#2883ff', connected: '#42b311', missed: '#f4372a', followups: '#f1a013' },
@@ -311,7 +316,7 @@ export const CHART_DEFAULTS = {
 };
 
 // ---------- per-card settings panel schema ----------
-const SETTINGS_SCHEMA = {
+const SETTINGS_SCHEMA: Record<string, any> = {
   'manager-call-trend': [
     { key: 'Chart type', type: 'tabs', path: 'chartType', options: ['area', 'bar', 'line'] },
     { key: 'Colors', type: 'multiColor', swatches: SWATCH_SET, items: [
@@ -403,7 +408,7 @@ export const NO_SETTINGS_CARDS = ['agent-stats-row', 'agent-targets', 'manager-k
 
 export const CHART_CARD_IDS = Object.keys(CHART_DEFAULTS);
 
-const ToggleSwitch = ({ checked, onChange }) => (
+const ToggleSwitch = ({ checked, onChange }: any) => (
   <span
     onClick={() => onChange(!checked)}
     className={`relative inline-block rounded-full cursor-pointer transition-colors ${checked ? 'bg-[#7ed3cf]' : 'bg-[#e0e0e0]'}`}
@@ -416,12 +421,12 @@ const ToggleSwitch = ({ checked, onChange }) => (
   </span>
 );
 
-const SettingControl = ({ row, config, onUpdate, data }) => {
+const SettingControl = ({ row, config, onUpdate, data }: any) => {
   switch (row.type) {
     case 'tabs':
       return (
         <div className="flex gap-2 flex-wrap">
-          {row.options.map((t) => (
+          {row.options.map((t: any) => (
             <button
               key={t}
               onClick={() => onUpdate(row.path, t)}
@@ -435,7 +440,7 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
     case 'colorSwatch':
       return (
         <div className="flex gap-2">
-          {row.swatches.map((c) => (
+          {row.swatches.map((c: any) => (
             <button
               key={c}
               onClick={() => onUpdate(row.path, c)}
@@ -448,7 +453,7 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
     case 'labeledSwatch':
       return (
         <div className="flex gap-3">
-          {row.swatches.map((s) => (
+          {row.swatches.map((s: any) => (
             <button key={s.value} onClick={() => onUpdate(row.path, s.value)} className="flex flex-col items-center gap-1">
               <span
                 className="w-6 h-6 rounded-full border-2"
@@ -462,11 +467,11 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
     case 'multiColor':
       return (
         <div className="flex flex-col gap-3">
-          {row.items.map((item) => (
+          {row.items.map((item: any) => (
             <div key={item.path}>
               <div className="text-[11px] text-[#949494] mb-1">{item.label}</div>
               <div className="flex gap-2">
-                {row.swatches.map((c) => (
+                {row.swatches.map((c: any) => (
                   <button
                     key={c}
                     onClick={() => onUpdate(item.path, c)}
@@ -480,14 +485,14 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
         </div>
       );
     case 'toggle':
-      return <ToggleSwitch checked={getPath(config, row.path)} onChange={(v) => onUpdate(row.path, v)} />;
+      return <ToggleSwitch checked={getPath(config, row.path)} onChange={(v: any) => onUpdate(row.path, v)} />;
     case 'toggleGroup':
       return (
         <div className="flex flex-col gap-3">
-          {row.items.map((item) => (
+          {row.items.map((item: any) => (
             <div key={item.path} className="flex items-center justify-between">
               <span className="text-[12px] text-[#585858]">{item.label}</span>
-              <ToggleSwitch checked={getPath(config, item.path)} onChange={(v) => onUpdate(item.path, v)} />
+              <ToggleSwitch checked={getPath(config, item.path)} onChange={(v: any) => onUpdate(item.path, v)} />
             </div>
           ))}
         </div>
@@ -495,7 +500,7 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
     case 'radio':
       return (
         <div className="flex flex-col gap-2">
-          {row.options.map((o) => (
+          {row.options.map((o: any) => (
             <label key={o.value} className="flex items-center gap-2 text-[12px] text-[#585858] cursor-pointer">
               <input type="radio" checked={(getPath(config, row.path) ?? row.defaultValue) === o.value} onChange={() => onUpdate(row.path, o.value)} />
               {o.label}
@@ -519,12 +524,12 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
         <table className="w-full text-[11px]">
           <thead>
             <tr className="text-left text-[#949494]">
-              {data.columns.map((c) => <th key={c} className="py-1 font-medium">{c}</th>)}
+              {data.columns.map((c: any) => <th key={c} className="py-1 font-medium">{c}</th>)}
             </tr>
           </thead>
           <tbody>
-            {data.rows.map((r, i) => (
-              <tr key={i}>{r.map((v, j) => <td key={j} className="py-1 text-[#585858]">{v}</td>)}</tr>
+            {data.rows.map((r: any, i: number) => (
+              <tr key={i}>{r.map((v: any, j: number) => <td key={j} className="py-1 text-[#585858]">{v}</td>)}</tr>
             ))}
           </tbody>
         </table>
@@ -535,7 +540,7 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
   }
 };
 
-const AccordionRow = ({ label, open, onToggle, row, config, onUpdate, data }) => (
+const AccordionRow = ({ label, open, onToggle, row, config, onUpdate, data }: any) => (
   <div className="border-b border-[#e0e0e0]">
     <button onClick={onToggle} className="w-full flex items-center justify-between py-2 text-[12px] font-medium text-[#585858]">
       {label}
@@ -550,7 +555,7 @@ const RECHARTS_FULL = '[&_.recharts-responsive-container]:!w-full [&_.recharts-r
 const TITLE_ROW = '[&>*:first-child]:shrink-0 [&>*:first-child]:pb-4 [&>*:first-child]:border-b [&>*:first-child]:border-[#eaeaea]';
 const DEFAULT_EXTRA = `[&>div:first-child]:shrink-0 [&>div:first-child]:!mb-0 [&>div:first-child]:pb-4 [&>div:first-child]:border-b [&>div:first-child]:border-[#eaeaea] [&>div:last-child]:flex-1 [&>div:last-child]:min-h-0 [&>div:last-child]:!h-auto [&>div:last-child]:flex [&>div:last-child]:flex-col [&>div:last-child]:justify-center [&>div:last-child]:overflow-y-auto ${RECHARTS_FULL}`;
 
-const FULLSCREEN_CONFIG = {
+const FULLSCREEN_CONFIG: Record<string, any> = {
   'manager-rep-performance': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-center [&_.h-2]:!h-8 [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
   'founder-annual-revenue': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
   'founder-monthly-revenue': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0`,
@@ -565,7 +570,7 @@ const AGENT_STATS_GRID = `${STAT_CENTERED} [&>*:nth-child(2)>div]:!grid [&>*:nth
 const AGENT_TARGETS_BARS = `${TITLE_ROW} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-center`;
 
 // ---------- text size scaling for stat-only fullscreen views ----------
-const TEXT_SIZE_CLASS = {
+const TEXT_SIZE_CLASS: Record<string, any> = {
   large: '[&_.stat-number]:!text-[1.35em]',
   xl: '[&_.stat-number]:!text-[1.7em]',
 };
@@ -585,15 +590,15 @@ const STAT_SETTINGS_SCHEMA = [
   ] },
 ];
 
-const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) => {
+const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }: any) => {
   const { getConfig, setConfig } = useContext(ChartConfigRegistryContext);
-  const [openRow, setOpenRow] = useState(null);
+  const [openRow, setOpenRow] = useState<any>(null);
 
   const statOnly = hasChart !== undefined ? !hasChart : NO_SETTINGS_CARDS.includes(cardId);
   const schema = SETTINGS_SCHEMA[cardId];
   const defaults = CHART_DEFAULTS[cardId] || {};
   const config = getConfig(cardId, defaults);
-  const onUpdate = (path, value) => setConfig(cardId, setPath(config, path, value));
+  const onUpdate = (path: any, value: any) => setConfig(cardId, setPath(config, path, value));
   const isStatCentered = cardId === 'agent-stats-row' || cardId === 'agent-performance';
   const showSettingsPanel = mode === 'settings';
   const textSizeClass = TEXT_SIZE_CLASS[config?.textSize] || '';
@@ -611,14 +616,14 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
             cardId === 'agent-performance' ? (
               <div className="w-full flex flex-col" style={{ height: '85vh' }}>
                 <div style={{ flexShrink: 0, padding: '24px 32px', borderBottom: '1px solid #e8e8e8' }}>
-                  {Children.toArray(children)[0]}
+                  {Children.toArray(children)[0] as React.ReactElement}
                 </div>
                 <div
                   className={`w-full ${RECHARTS_FULL} [&_.relative]:!w-[380px] [&_.relative]:!h-[380px] [&_.text-\\[28px\\]]:!text-[64px] [&_.text-\\[28px\\]]:!font-semibold [&_.text-\\[12px\\]]:!text-[16px] [&_.text-\\[12px\\]]:!text-[#949494] [&_.text-\\[13px\\]]:!text-[20px] [&_.text-\\[13px\\]]:!text-[#737373]`}
                   style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
                 >
                   <div style={{ width: 380, height: 380, margin: '0 auto' }} className="relative">
-                    {Children.toArray(children)[1]}
+                    {Children.toArray(children)[1] as React.ReactElement}
                   </div>
                   <div className="flex items-center justify-evenly w-full" style={{ marginTop: 24 }}>
                     {[
@@ -663,12 +668,12 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
           <div className="border-l border-[#e0e0e0] p-6 overflow-y-auto" style={{ width: 300, flexShrink: 0 }}>
             <h4 className="text-[15px] font-semibold text-[#1a1a1a] mb-3">Widget settings</h4>
             {(schema || (!CHART_CARD_IDS.includes(cardId) ? STAT_SETTINGS_SCHEMA : null)) ? (
-              (schema || STAT_SETTINGS_SCHEMA).map((row) => (
+              (schema || STAT_SETTINGS_SCHEMA).map((row: any) => (
                 <AccordionRow
                   key={row.key}
                   label={row.key}
                   open={openRow === row.key}
-                  onToggle={() => setOpenRow((r) => (r === row.key ? null : row.key))}
+                  onToggle={() => setOpenRow((r: any) => (r === row.key ? null : row.key))}
                   row={row}
                   config={config}
                   onUpdate={onUpdate}
@@ -686,13 +691,13 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
   );
 };
 
-export const Card = ({ children, className = '', cardId, title, data, hasChart, onRemove, onDuplicate }) => {
+export const Card = ({ children, className = '', cardId, title, data, hasChart, onRemove, onDuplicate }: any) => {
   const { getConfig } = useContext(ChartConfigRegistryContext);
   const config = getConfig(cardId, CHART_DEFAULTS[cardId] || {});
-  const [modalMode, setModalMode] = useState(null);
+  const [modalMode, setModalMode] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [removed, setRemoved] = useState(false);
-  const [toast, setToast] = useState(null);
+  const [toast, setToast] = useState<any>(null);
   const [toastVisible, setToastVisible] = useState(false);
 
   useEffect(() => {
@@ -755,7 +760,7 @@ export const Sparkle = () => (
 );
 
 // ---------- Sales Agent visualisation helpers ----------
-export const RadialGauge = ({ pct, display, label, size = 88, color }) => (
+export const RadialGauge = ({ pct, display, label, size = 88, color }: any) => (
   <div className="flex flex-col items-center gap-2">
     <div className="relative" style={{ width: size, height: size }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -772,7 +777,7 @@ export const RadialGauge = ({ pct, display, label, size = 88, color }) => (
   </div>
 );
 
-export const AnimatedProgressBar = ({ label, current, target, pct, color }) => {
+export const AnimatedProgressBar = ({ label, current, target, pct, color }: any) => {
   const [width, setWidth] = useState(0);
   useEffect(() => {
     const t = setTimeout(() => setWidth(pct), 100);
@@ -791,28 +796,28 @@ export const AnimatedProgressBar = ({ label, current, target, pct, color }) => {
 
 export const FUNNEL_WIDTHS = ['100%', '82%', '64%', '46%', '30%'];
 
-export const PipelineFunnel = ({ data, color = '#7ed3cf', showLabels = true }) => (
+export const PipelineFunnel = ({ data, color = '#7ed3cf', showLabels = true }: any) => (
   <div className="flex flex-col items-center gap-2 h-full overflow-y-auto py-2">
-    {data.map((stage, i) => (
+    {data.map((stage: any, i: number) => (
       <div
         key={stage.name}
         className="text-white text-[12px] font-medium rounded-sm flex items-center justify-center flex-1 w-full"
         style={{ maxWidth: FUNNEL_WIDTHS[i], backgroundColor: color }}
       >
-        {showLabels ? `${stage.name} — ${stage.value}` : ' '}
+        {showLabels ? `${stage.name} — ${stage.value}` : ' '}
       </div>
     ))}
   </div>
 );
 
 // ---------- Admin/Founder visualisation helpers ----------
-export const scoreBadgeClass = (score) => {
+export const scoreBadgeClass = (score: number) => {
   if (score >= 70) return 'bg-[#eaf7e9] text-[#3ca30f]';
   if (score >= 50) return 'bg-[#fdf3e0] text-[#f1a013]';
   return 'bg-[#fbe7e5] text-[#de3226]';
 };
 
-export const PerformersTable = ({ data, color }) => (
+export const PerformersTable = ({ data, color }: any) => (
   <table className="w-full text-[12px] border-collapse">
     <thead>
       <tr className="text-left text-[#949494]">
@@ -823,7 +828,7 @@ export const PerformersTable = ({ data, color }) => (
       </tr>
     </thead>
     <tbody>
-      {data.map((rep, i) => (
+      {data.map((rep: any, i: number) => (
         <tr key={rep.name} className={i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}>
           <td className="py-2 px-3 text-[#585858] border-b border-[#e0e0e0]">{rep.name}</td>
           <td className="py-2 px-3 border-b border-[#e0e0e0]">
@@ -838,7 +843,7 @@ export const PerformersTable = ({ data, color }) => (
 );
 
 // ---------- sidebar icon ----------
-export const SidebarIcon = ({ icon: Icon, active }) => (
+export const SidebarIcon = ({ icon: Icon, active }: any) => (
   <div
     className="flex flex-col justify-center items-center cursor-pointer transition-colors duration-150"
     style={{
