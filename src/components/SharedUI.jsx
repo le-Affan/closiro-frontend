@@ -123,7 +123,7 @@ export const CardMenu = ({ onAction }) => {
         <DotsIcon />
       </button>
       {open && (
-        <div className="absolute right-0 top-6 z-20 bg-white border border-[#e0e0e0] rounded-md shadow-md py-1 w-36">
+        <div className="absolute right-0 top-6 z-20 bg-white border border-[#e0e0e0] rounded-sm shadow-md py-1 w-36">
           {MENU_ITEMS.map(({ label, icon: Icon }) => (
             <button
               key={label}
@@ -185,7 +185,7 @@ export const CardHeader = ({ title }) => {
           className="text-[15px] font-semibold text-[#1a1a1a] border border-[#e0e0e0] rounded px-1 outline-none"
         />
       ) : (
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <h3 className="text-[15px] font-semibold text-[#1a1a1a]">{name}</h3>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -537,7 +537,7 @@ const SettingControl = ({ row, config, onUpdate, data }) => {
 
 const AccordionRow = ({ label, open, onToggle, row, config, onUpdate, data }) => (
   <div className="border-b border-[#e0e0e0]">
-    <button onClick={onToggle} className="w-full flex items-center justify-between py-2.5 text-[12px] font-medium text-[#585858]">
+    <button onClick={onToggle} className="w-full flex items-center justify-between py-2 text-[12px] font-medium text-[#585858]">
       {label}
       <ChevronDown open={open} />
     </button>
@@ -547,18 +547,18 @@ const AccordionRow = ({ label, open, onToggle, row, config, onUpdate, data }) =>
 
 // ---------- per-card fullscreen layout overrides ----------
 const RECHARTS_FULL = '[&_.recharts-responsive-container]:!w-full [&_.recharts-responsive-container]:!h-full';
-const TITLE_ROW = '[&>*:first-child]:shrink-0 [&>*:first-child]:pb-4 [&>*:first-child]:border-b [&>*:first-child]:border-[#e8e8e8]';
-const DEFAULT_EXTRA = `[&>div:first-child]:shrink-0 [&>div:first-child]:!mb-0 [&>div:first-child]:pb-4 [&>div:first-child]:border-b [&>div:first-child]:border-[#e8e8e8] [&>div:last-child]:flex-1 [&>div:last-child]:min-h-0 [&>div:last-child]:!h-auto [&>div:last-child]:flex [&>div:last-child]:flex-col [&>div:last-child]:justify-center [&>div:last-child]:overflow-y-auto ${RECHARTS_FULL}`;
+const TITLE_ROW = '[&>*:first-child]:shrink-0 [&>*:first-child]:pb-4 [&>*:first-child]:border-b [&>*:first-child]:border-[#eaeaea]';
+const DEFAULT_EXTRA = `[&>div:first-child]:shrink-0 [&>div:first-child]:!mb-0 [&>div:first-child]:pb-4 [&>div:first-child]:border-b [&>div:first-child]:border-[#eaeaea] [&>div:last-child]:flex-1 [&>div:last-child]:min-h-0 [&>div:last-child]:!h-auto [&>div:last-child]:flex [&>div:last-child]:flex-col [&>div:last-child]:justify-center [&>div:last-child]:overflow-y-auto ${RECHARTS_FULL}`;
 
 const FULLSCREEN_CONFIG = {
   'manager-rep-performance': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:flex-col [&>*:nth-child(2)]:justify-center [&_.h-2]:!h-8 [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
   'founder-annual-revenue': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0 [&>*:nth-child(4)]:shrink-0`,
   'founder-monthly-revenue': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0`,
-  'founder-pipeline': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:shrink-0 [&>*:nth-child(3)]:flex-1 [&>*:nth-child(3)]:min-h-0 [&>*:nth-child(3)>*:first-child]:!h-full [&_.rounded-md]:flex-1`,
-  'agent-pipeline': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0 [&_.rounded-md]:flex-1`,
+  'founder-pipeline': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:shrink-0 [&>*:nth-child(3)]:flex-1 [&>*:nth-child(3)]:min-h-0 [&>*:nth-child(3)>*:first-child]:!h-full [&_.rounded-sm]:flex-1`,
+  'agent-pipeline': `${TITLE_ROW} ${RECHARTS_FULL} [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:!h-auto [&>*:nth-child(3)]:shrink-0 [&_.rounded-sm]:flex-1`,
 };
 
-const STAT_CENTERED = `flex flex-col h-full [&>*:first-child]:shrink-0 [&>*:first-child]:!mb-0 [&>*:first-child]:px-8 [&>*:first-child]:py-6 [&>*:first-child]:border-b [&>*:first-child]:border-[#e8e8e8] [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:items-center [&>*:nth-child(2)]:justify-center [&>*:nth-child(2)]:p-8`;
+const STAT_CENTERED = `flex flex-col h-full [&>*:first-child]:shrink-0 [&>*:first-child]:!mb-0 [&>*:first-child]:px-8 [&>*:first-child]:py-6 [&>*:first-child]:border-b [&>*:first-child]:border-[#eaeaea] [&>*:nth-child(2)]:flex-1 [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:flex [&>*:nth-child(2)]:items-center [&>*:nth-child(2)]:justify-center [&>*:nth-child(2)]:p-8`;
 
 const AGENT_STATS_GRID = `${STAT_CENTERED} [&>*:nth-child(2)>div]:!grid [&>*:nth-child(2)>div]:!grid-cols-2 [&>*:nth-child(2)>div]:!grid-rows-2 [&>*:nth-child(2)>div]:!gap-12 [&_.relative]:!w-[200px] [&_.relative]:!h-[200px] ${RECHARTS_FULL} [&_.absolute]:!text-[36px] [&_.absolute]:!font-semibold [&_.absolute]:!text-[#1a1a1a] [&_.text-\\[11px\\]]:!text-[14px] [&_.text-\\[11px\\]]:!text-[#949494] [&_.text-\\[11px\\]]:!mt-2`;
 
@@ -614,7 +614,7 @@ const FullscreenModal = ({ mode, cardId, data, hasChart, onClose, children }) =>
                   {Children.toArray(children)[0]}
                 </div>
                 <div
-                  className={`w-full ${RECHARTS_FULL} [&_.relative]:!w-[380px] [&_.relative]:!h-[380px] [&_.text-\\[28px\\]]:!text-[64px] [&_.text-\\[28px\\]]:!font-bold [&_.text-\\[12px\\]]:!text-[16px] [&_.text-\\[12px\\]]:!text-[#949494] [&_.text-\\[13px\\]]:!text-[20px] [&_.text-\\[13px\\]]:!text-[#737373]`}
+                  className={`w-full ${RECHARTS_FULL} [&_.relative]:!w-[380px] [&_.relative]:!h-[380px] [&_.text-\\[28px\\]]:!text-[64px] [&_.text-\\[28px\\]]:!font-semibold [&_.text-\\[12px\\]]:!text-[16px] [&_.text-\\[12px\\]]:!text-[#949494] [&_.text-\\[13px\\]]:!text-[20px] [&_.text-\\[13px\\]]:!text-[#737373]`}
                   style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
                 >
                   <div style={{ width: 380, height: 380, margin: '0 auto' }} className="relative">
@@ -721,7 +721,7 @@ export const Card = ({ children, className = '', cardId, title, data, hasChart, 
           {children}
 
           {toast && (
-            <div className={`fixed bottom-6 right-6 bg-[#1a1a1a] text-white text-[13px] px-5 py-3 rounded-lg shadow-lg z-50 border-l-[3px] ${toast.includes('duplicated') ? 'border-l-[#22c55e]' : 'border-l-[#5bc4bf]'} transition-all duration-300 ${toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>{toast}</div>
+            <div className={`fixed bottom-6 right-6 bg-[#1a1a1a] text-white text-[13px] px-5 py-3 rounded-lg shadow-lg z-50 border-l-[3px] ${toast.includes('duplicated') ? 'border-l-[#3ca30f]' : 'border-l-[#5bc4bf]'} transition-all duration-300 ${toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>{toast}</div>
           )}
 
           {confirmDelete && (
@@ -761,7 +761,7 @@ export const RadialGauge = ({ pct, display, label, size = 88, color }) => (
       <ResponsiveContainer width="100%" height="100%">
         <RadialBarChart data={[{ value: Math.min(pct, 100) }]} startAngle={90} endAngle={-270} innerRadius="65%" outerRadius="85%" barSize={8}>
           <PolarAngleAxis type="number" domain={[0, 100]} dataKey="value" tick={false} />
-          <RadialBar dataKey="value" cornerRadius={8} minAngle={0} clockWise background={{ fill: '#f0f0f0' }} fill={color || '#7ed3cf'} />
+          <RadialBar dataKey="value" cornerRadius={8} minAngle={0} clockWise background={{ fill: '#f1f1f1' }} fill={color || '#7ed3cf'} />
         </RadialBarChart>
       </ResponsiveContainer>
       <div className="absolute inset-0 flex items-center justify-center text-[13px] font-semibold text-[#585858] text-center px-1 stat-number" style={color ? { color } : undefined}>
@@ -781,8 +781,8 @@ export const AnimatedProgressBar = ({ label, current, target, pct, color }) => {
   return (
     <div className="flex items-center gap-4">
       <span className="text-[12px] text-[#585858] w-36 shrink-0 stat-label">{label}</span>
-      <div className="flex-1 h-3 bg-[#f0f0f0] rounded-md overflow-hidden">
-        <div className="h-full rounded-md transition-all duration-1000" style={{ width: `${width}%`, backgroundColor: color || '#7ed3cf' }} />
+      <div className="flex-1 h-3 bg-[#f1f1f1] rounded-sm overflow-hidden">
+        <div className="h-full rounded-sm transition-all duration-1000" style={{ width: `${width}%`, backgroundColor: color || '#7ed3cf' }} />
       </div>
       <span className="text-[12px] text-[#949494] w-24 text-right shrink-0 stat-number" style={color ? { color } : undefined}>{current} / {target}</span>
     </div>
@@ -796,7 +796,7 @@ export const PipelineFunnel = ({ data, color = '#7ed3cf', showLabels = true }) =
     {data.map((stage, i) => (
       <div
         key={stage.name}
-        className="text-white text-[12px] font-medium rounded-md flex items-center justify-center flex-1 w-full"
+        className="text-white text-[12px] font-medium rounded-sm flex items-center justify-center flex-1 w-full"
         style={{ maxWidth: FUNNEL_WIDTHS[i], backgroundColor: color }}
       >
         {showLabels ? `${stage.name} — ${stage.value}` : ' '}

@@ -266,7 +266,7 @@ const FounderView = () => {
   const cards = {
     'founder-kpi-pills': (
       <Card cardId="founder-kpi-pills">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           {adminKpis.map((kpi) => (
             <div key={kpi.label} className="flex items-center gap-2">
               <DownArrow color={kpi.color} />
@@ -292,7 +292,7 @@ const FounderView = () => {
     'founder-monthly-revenue': (
       <Card cardId="founder-monthly-revenue" title="Monthly Revenue Target" data={monthlyTableData} hasChart onDuplicate={handleDuplicate}>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <h3 className="text-[13px] font-semibold text-[#585858]">Monthly Revenue Target</h3>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M3 4.5L6 7.5L9 4.5" stroke="#bebebe" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />

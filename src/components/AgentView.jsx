@@ -144,7 +144,7 @@ const AgentView = () => {
               return (
                 <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
                   <span style={{ width: 160, fontSize: 14, color: '#585858' }}>{t.label}</span>
-                  <div style={{ flex: 1, height: 12, background: '#f0f0f0', borderRadius: 6, overflow: 'hidden' }}>
+                  <div style={{ flex: 1, height: 12, background: '#f0f0f0', borderRadius: 4, overflow: 'hidden' }}>
                     <div style={{ width: pct + '%', height: '100%', background: targetsColor || '#7ed3cf', borderRadius: 6 }} />
                   </div>
                   <span style={{ width: 80, textAlign: 'right', fontSize: 13, color: '#737373' }}>{t.current} / {t.target}</span>

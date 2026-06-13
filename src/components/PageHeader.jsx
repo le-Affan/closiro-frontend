@@ -44,7 +44,7 @@ const GenerateReportButton = ({ selectedProfile }) => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="bg-[#5bc4bf] hover:bg-[#4aada8] text-white text-[12px] font-medium rounded-md px-4 py-2 flex items-center gap-1.5 transition-colors duration-150"
+        className="bg-[#5bc4bf] hover:bg-[#4aada8] text-white text-[12px] font-medium rounded-sm px-4 py-2 flex items-center gap-2 transition-colors duration-150"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <path d="M12 20h9" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -83,7 +83,7 @@ const GenerateReportButton = ({ selectedProfile }) => {
               </table>
 
               <h4 className="text-[13px] font-semibold text-[#585858] mb-2">Charts included</h4>
-              <ul className="text-[12px] text-[#737373] list-disc pl-4 space-y-0.5">
+              <ul className="text-[12px] text-[#737373] list-disc pl-4 space-y-1">
                 {cards.map((c) => <li key={c}>{c}</li>)}
               </ul>
             </div>
@@ -166,7 +166,7 @@ const SearchActionButton = ({ query, setQuery }) => {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-md px-4 py-2 flex items-center gap-1.5 hover:bg-[#f4f6f8] transition-colors duration-150"
+      className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 flex items-center gap-2 hover:bg-[#f4f6f8] transition-colors duration-150"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
         <circle cx="11" cy="11" r="7" stroke="#585858" strokeWidth="2.5" />
@@ -207,7 +207,7 @@ const FiltersActionButton = () => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-md px-4 py-2 flex items-center gap-1.5 hover:bg-[#f4f6f8] transition-colors duration-150"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 flex items-center gap-2 hover:bg-[#f4f6f8] transition-colors duration-150"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <path d="M4 6h16M8 6v0M4 12h16M14 12v0M4 18h16M10 18v0" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -259,7 +259,7 @@ const PeriodActionButton = () => {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-md px-4 py-2 flex items-center gap-1.5 hover:bg-[#f4f6f8] transition-colors duration-150"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 flex items-center gap-2 hover:bg-[#f4f6f8] transition-colors duration-150"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <rect x="3" y="4" width="18" height="18" rx="2" stroke="#585858" strokeWidth="2.5" />
@@ -333,7 +333,7 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-md px-4 py-2 flex items-center gap-1.5 hover:bg-[#f4f6f8] transition-colors duration-150"
+        className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 flex items-center gap-2 hover:bg-[#f4f6f8] transition-colors duration-150"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
           <path d="M12 5v14M5 12h14" stroke="#585858" strokeWidth="2.5" strokeLinecap="round" />
@@ -355,9 +355,9 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
                 <button
                   key={opt.name}
                   onClick={() => handleSelect(opt)}
-                  className="text-left border border-[#e0e0e0] rounded-lg p-2.5 hover:bg-[#fafafa]"
+                  className="text-left border border-[#e0e0e0] rounded-lg p-2 hover:bg-[#fafafa]"
                 >
-                  <div className="flex items-center gap-1.5 mb-1">
+                  <div className="flex items-center gap-2 mb-1">
                     <WidgetIcon />
                     <span className="text-[11px] font-medium text-[#585858]">{opt.name}</span>
                   </div>
@@ -405,7 +405,7 @@ const PageHeader = ({ selectedProfile }) => {
       </div>
 
       {searchQuery && (
-        <div className="text-[11px] text-[#737373] bg-[#f5f5f5] border border-[#eaeaea] inline-block px-2.5 py-1 rounded-md w-fit">
+        <div className="text-[11px] text-[#737373] bg-[#fafafa] border border-[#eaeaea] inline-block p-2 rounded-sm w-fit">
           Searching for: {searchQuery}
         </div>
       )}

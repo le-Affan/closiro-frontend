@@ -122,7 +122,7 @@ const RepPerformanceList = ({ reps }) => {
   });
 
   return (
-    <div className="flex flex-col gap-2.5 h-full overflow-y-auto">
+    <div className="flex flex-col gap-2 h-full overflow-y-auto">
       {sorted.map((rep) => (
         <div key={rep.name} className="flex items-center gap-3 flex-1">
           <span className="text-[11px] text-[#737373] w-28 shrink-0">{rep.name}</span>
@@ -221,7 +221,7 @@ const ManagerView = () => {
   const cards = {
     'manager-kpi-pills': (
       <Card cardId="manager-kpi-pills">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           {kpis.map((kpi) => (
             <div key={kpi.label} className="flex items-center gap-2">
               <DownArrow color={kpi.color} />
@@ -238,7 +238,7 @@ const ManagerView = () => {
       <Card cardId="manager-call-trend" title="Call Activity Trend" data={trendTableData} onDuplicate={handleDuplicate}>
         <CardHeader title="Call Activity Trend" />
         {period && (
-          <div className="mb-3 text-[11px] text-[#737373] bg-[#f5f5f5] border border-[#eaeaea] inline-block px-2.5 py-1 rounded-md">
+          <div className="mb-3 text-[11px] text-[#737373] bg-[#fafafa] border border-[#eaeaea] inline-block p-2 rounded-sm">
             Showing data for: {period}
           </div>
         )}
@@ -256,13 +256,13 @@ const ManagerView = () => {
           <RepPerformanceList reps={filteredRepData} />
         </div>
         <div className="flex items-center gap-6 mt-4 text-[11px] text-[#737373] shrink-0">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#3ca30f]" /> GOOD <span className="font-semibold text-[#585858]">70%</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#f1a013]" /> AVERAGE <span className="font-semibold text-[#585858]">25%</span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#de3226]" /> BAD <span className="font-semibold text-[#585858]">5%</span>
           </div>
         </div>
