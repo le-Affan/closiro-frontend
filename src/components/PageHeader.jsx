@@ -385,7 +385,7 @@ const PageHeader = ({ selectedProfile }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <>
+    <div style={{ display: 'flex', padding: '12px 20px 24px 20px', flexDirection: 'column', alignItems: 'flex-start', gap: 20, alignSelf: 'stretch', borderBottom: '1px solid #eaeaea', background: '#ffffff' }}>
       {/* Header */}
       <div>
         <div style={{ width: 1120, height: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'stretch', gap: 8 }}>
@@ -400,7 +400,7 @@ const PageHeader = ({ selectedProfile }) => {
       </div>
 
       {/* Action bar */}
-      <div style={{ padding: '20px 20px 24px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'stretch' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'stretch' }}>
         <div className="flex items-center gap-2">
           <GenerateReportButton selectedProfile={selectedProfile} />
           <div className="w-px h-5 bg-[#e0e0e0] mx-2" />
@@ -419,7 +419,7 @@ const PageHeader = ({ selectedProfile }) => {
           Searching for: {searchQuery}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
