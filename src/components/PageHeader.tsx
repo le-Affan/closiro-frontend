@@ -21,7 +21,7 @@ const TOOLBAR_BTN_STYLE = {
   color: '#585858',
 };
 
-const PROFILE_CARDS = {
+const PROFILE_CARDS: Record<string, string[]> = {
   'Sales Agent': ['My Stats', 'Personal Targets', 'My Pipeline', 'My Performance'],
   'Sales Manager': ['Call Activity Trend', 'Rep Performance Score', 'Conversion Rate by Lead Source'],
   'Admin/Founder': ['Annual Revenue Target', 'Monthly Revenue Target', 'Pipeline Conversation', 'Top Performers'],
@@ -35,7 +35,7 @@ const KEY_METRICS = [
 ];
 
 // ---------- interactive action-bar buttons (self-contained) ----------
-const GenerateReportButton = ({ selectedProfile }) => {
+const GenerateReportButton = ({ selectedProfile }: { selectedProfile: string }) => {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [toast, setToast] = useState(false);
@@ -157,15 +157,15 @@ const GenerateReportButton = ({ selectedProfile }) => {
   );
 };
 
-const SearchActionButton = ({ query, setQuery }) => {
+const SearchActionButton = ({ query, setQuery }: { query: string; setQuery: (value: string) => void }) => {
   const [open, setOpen] = useState(false);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open && inputRef.current) inputRef.current.focus();
   }, [open]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
     window.dispatchEvent(new CustomEvent('dashboardSearch', { detail: { query: e.target.value } }));
   };
@@ -184,7 +184,7 @@ const SearchActionButton = ({ query, setQuery }) => {
         value={query}
         onChange={handleChange}
         placeholder="Search..."
-        onKeyDown={(e) => e.key === 'Escape' && handleClose()}
+        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Escape' && handleClose()}
         onBlur={() => setOpen(false)}
         className="text-[12px] font-medium text-[#585858] border-[1.5px] border-[#e0e0e0] rounded-lg px-3 py-2 outline-none w-32"
       />
@@ -203,18 +203,18 @@ const FILTER_OPTIONS = ['Connected Calls', 'Missed Calls', 'Follow-ups', 'Lead S
 
 const FiltersActionButton = () => {
   const [open, setOpen] = useState(false);
-  const [checked, setChecked] = useState({});
-  const ref = useRef(null);
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
-  const toggle = (opt) => {
+  const toggle = (opt: string) => {
     setChecked((c) => {
       const next = { ...c, [opt]: !c[opt] };
       const filters = FILTER_OPTIONS.filter((o) => next[o]);
@@ -259,11 +259,11 @@ const PERIOD_OPTIONS = ['Last 7 days', 'Last 30 days', 'Last Quarter', 'This Yea
 const PeriodActionButton = () => {
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState('Period');
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
@@ -296,7 +296,7 @@ const PeriodActionButton = () => {
   );
 };
 
-const WIDGET_OPTIONS = {
+const WIDGET_OPTIONS: Record<string, { name: string; type: string; desc: string }[]> = {
   all: [
     { name: 'KPI Counter', type: 'kpi-counter', desc: 'Single metric with trend indicator' },
     { name: 'Text Note', type: 'text-note', desc: 'Free-form note or annotation' },
@@ -322,13 +322,13 @@ const WidgetIcon = () => (
   </svg>
 );
 
-const AddWidgetActionButton = ({ selectedProfile }) => {
+const AddWidgetActionButton = ({ selectedProfile }: { selectedProfile: string }) => {
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState(false);
 
   const options = [...WIDGET_OPTIONS.all, ...(WIDGET_OPTIONS[selectedProfile] || [])];
 
-  const handleSelect = (opt) => {
+  const handleSelect = (opt: { name: string; type: string; desc: string }) => {
     window.dispatchEvent(new CustomEvent('addWidget', {
       detail: { name: opt.name, type: opt.type, profile: selectedProfile },
     }));
@@ -380,7 +380,7 @@ const AddWidgetActionButton = ({ selectedProfile }) => {
   );
 };
 
-const PageHeader = ({ selectedProfile }) => {
+const PageHeader = ({ selectedProfile }: { selectedProfile: string }) => {
   const isAgent = selectedProfile === 'Sales Agent';
   const [searchQuery, setSearchQuery] = useState('');
 

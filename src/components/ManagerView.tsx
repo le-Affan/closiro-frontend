@@ -4,12 +4,14 @@ import {
   XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend,
 } from 'recharts';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { Card, CardHeader, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
-import { kpis, trendData, repData, leadSourceData } from '../data/mockData';
+import { Card as CardRaw, CardHeader, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
+import { kpis, trendData, repData, leadSourceData, RepDatum } from '../data/mockData';
+
+const Card: any = CardRaw;
 
 const LAYOUT_KEY = 'closira-layout-manager';
 
-const KPI_DOT_COLORS = {
+const KPI_DOT_COLORS: Record<string, string> = {
   'Total Calls': '#2883ff',
   'Connected Calls': '#42b311',
   'Missed Calls': '#f4372a',
@@ -17,7 +19,7 @@ const KPI_DOT_COLORS = {
   'Conversion Signal': '#a1e2b3',
 };
 
-const DEFAULT_LAYOUTS = {
+const DEFAULT_LAYOUTS: any = {
   lg: [
     { i: 'manager-kpi-pills', x: 0, y: 0, w: 12, h: 1 },
     { i: 'manager-call-trend', x: 0, y: 1, w: 12, h: 4 },
@@ -26,10 +28,10 @@ const DEFAULT_LAYOUTS = {
   ],
 };
 
-const useChartConfig = () => {
-  const { getConfig } = useContext(ChartConfigRegistryContext);
+const useChartConfig = (): any => {
+  const { getConfig } = useContext(ChartConfigRegistryContext) as any;
   const cardId = useContext(CardIdContext);
-  return getConfig(cardId, CHART_DEFAULTS[cardId]);
+  return getConfig(cardId, (CHART_DEFAULTS as any)[cardId as any]);
 };
 
 const CallActivityChart = () => {
@@ -119,9 +121,9 @@ const ConversionByLeadSourceChart = () => {
   );
 };
 
-const repCategory = (score) => (score >= 70 ? 'good' : score >= 50 ? 'average' : 'bad');
+const repCategory = (score: number) => (score >= 70 ? 'good' : score >= 50 ? 'average' : 'bad');
 
-const RepPerformanceList = ({ reps }) => {
+const RepPerformanceList = ({ reps }: { reps: RepDatum[] }) => {
   const { colors, sortOrder, showLabels } = useChartConfig();
 
   const sorted = [...reps].sort((a, b) => {
@@ -146,16 +148,16 @@ const RepPerformanceList = ({ reps }) => {
 };
 
 const ManagerView = () => {
-  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const { getConfig } = useContext(ChartConfigRegistryContext) as any;
   const kpiColor = getConfig('manager-kpi-pills', {}).colors?.primary;
   const [searchQuery, setSearchQuery] = useState('');
   const [period, setPeriod] = useState('');
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState<string[]>([]);
 
   useEffect(() => {
-    const onSearch = (e) => setSearchQuery(e.detail.query);
-    const onPeriod = (e) => setPeriod(e.detail.period);
-    const onFilter = (e) => setFilters(e.detail.filters);
+    const onSearch = (e: any) => setSearchQuery(e.detail.query);
+    const onPeriod = (e: any) => setPeriod(e.detail.period);
+    const onFilter = (e: any) => setFilters(e.detail.filters);
     window.addEventListener('dashboardSearch', onSearch);
     window.addEventListener('dashboardPeriod', onPeriod);
     window.addEventListener('dashboardFilter', onFilter);
@@ -183,7 +185,7 @@ const ManagerView = () => {
     rows: leadSourceData.map((s) => [s.name, `${s.value}%`]),
   };
 
-  const [layouts, setLayouts] = useState(() => {
+  const [layouts, setLayouts] = useState<any>(() => {
     try {
       const saved = localStorage.getItem(LAYOUT_KEY);
       if (saved) return JSON.parse(saved);
@@ -193,22 +195,22 @@ const ManagerView = () => {
     return DEFAULT_LAYOUTS;
   });
 
-  const updateLayouts = (update) => {
-    setLayouts((prev) => {
+  const updateLayouts = (update: any) => {
+    setLayouts((prev: any) => {
       const next = typeof update === 'function' ? update(prev) : update;
       localStorage.setItem(LAYOUT_KEY, JSON.stringify(next));
       return next;
     });
   };
 
-  const [addedWidgets, setAddedWidgets] = useState([]);
+  const [addedWidgets, setAddedWidgets] = useState<any[]>([]);
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: any) => {
       const id = Date.now();
       const widgetId = `added-widget-${id}`;
       setAddedWidgets((prev) => [...prev, { name: e.detail.name, type: e.detail.type, id }]);
-      updateLayouts((prev) => ({
+      updateLayouts((prev: any) => ({
         ...prev,
         lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
       }));
@@ -217,17 +219,17 @@ const ManagerView = () => {
     return () => window.removeEventListener('addWidget', handler);
   }, []);
 
-  const handleDuplicate = (cardTitle, cardId) => {
+  const handleDuplicate = (cardTitle: string, cardId: string) => {
     const id = Date.now();
     const widgetId = `added-widget-${id}`;
     setAddedWidgets((prev) => [...prev, { id, name: `${cardTitle} (Copy)`, type: cardId, sourceCardId: cardId }]);
-    updateLayouts((prev) => ({
+    updateLayouts((prev: any) => ({
       ...prev,
       lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
     }));
   };
 
-  const cards = {
+  const cards: Record<string, any> = {
     'manager-kpi-pills': (
       <Card cardId="manager-kpi-pills">
         <div style={{ display: 'flex', flexDirection: 'row', gap: 20, width: '100%' }}>
@@ -302,13 +304,13 @@ const ManagerView = () => {
     ),
   };
 
-  const widgetCards = {};
+  const widgetCards: Record<string, any> = {};
   addedWidgets.forEach((w) => {
     const widgetId = `added-widget-${w.id}`;
     widgetCards[widgetId] = (
       <Card cardId={widgetId} title={w.name} onDuplicate={handleDuplicate} onRemove={() => {
         setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
-        updateLayouts((prev) => ({ ...prev, lg: prev.lg.filter((l) => l.i !== widgetId) }));
+        updateLayouts((prev: any) => ({ ...prev, lg: prev.lg.filter((l: any) => l.i !== widgetId) }));
       }}>
         <CardHeader title={w.name} />
         <p className="text-[12px] text-[#949494]">Widget type: {w.type}</p>
@@ -327,7 +329,7 @@ const ManagerView = () => {
           ))}
         </div>
       )}
-      <DashboardGrid layouts={layouts} onLayoutChange={(_, all) => updateLayouts(all)}>
+      <DashboardGrid layouts={layouts} onLayoutChange={(_: any, all: any) => updateLayouts(all)}>
         {Object.keys(allCards).map((id) => (
           <div key={id}>{allCards[id]}</div>
         ))}

@@ -3,12 +3,14 @@ import {
   ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
-import { Card, CardHeader, RadialGauge, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
+import { Card as CardRaw, CardHeader, RadialGauge, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { agentStats, personalTargets, myPipelineData } from '../data/mockData';
+
+const Card: any = CardRaw;
 
 const LAYOUT_KEY = 'closira-layout-agent';
 
-const DEFAULT_LAYOUTS = {
+const DEFAULT_LAYOUTS: any = {
   lg: [
     { i: 'agent-stats-row', x: 0, y: 0, w: 12, h: 2 },
     { i: 'agent-targets', x: 0, y: 2, w: 12, h: 2 },
@@ -17,10 +19,10 @@ const DEFAULT_LAYOUTS = {
   ],
 };
 
-const useChartConfig = () => {
-  const { getConfig } = useContext(ChartConfigRegistryContext);
+const useChartConfig = (): any => {
+  const { getConfig } = useContext(ChartConfigRegistryContext) as any;
   const cardId = useContext(CardIdContext);
-  return getConfig(cardId, CHART_DEFAULTS[cardId]);
+  return getConfig(cardId, (CHART_DEFAULTS as any)[cardId as any]);
 };
 
 const MyPerformanceGauge = () => {
@@ -65,7 +67,7 @@ const MyPipelineChart = () => {
 };
 
 const AgentView = () => {
-  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const { getConfig } = useContext(ChartConfigRegistryContext) as any;
   const statsColor = getConfig('agent-stats-row', {}).colors?.primary;
   const targetsColor = getConfig('agent-targets', {}).colors?.primary;
 
@@ -79,7 +81,7 @@ const AgentView = () => {
     rows: [['Ava Chen', '80%', '#2 of 8']],
   };
 
-  const [layouts, setLayouts] = useState(() => {
+  const [layouts, setLayouts] = useState<any>(() => {
     try {
       const saved = localStorage.getItem(LAYOUT_KEY);
       if (saved) return JSON.parse(saved);
@@ -89,22 +91,22 @@ const AgentView = () => {
     return DEFAULT_LAYOUTS;
   });
 
-  const updateLayouts = (update) => {
-    setLayouts((prev) => {
+  const updateLayouts = (update: any) => {
+    setLayouts((prev: any) => {
       const next = typeof update === 'function' ? update(prev) : update;
       localStorage.setItem(LAYOUT_KEY, JSON.stringify(next));
       return next;
     });
   };
 
-  const [addedWidgets, setAddedWidgets] = useState([]);
+  const [addedWidgets, setAddedWidgets] = useState<any[]>([]);
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: any) => {
       const id = Date.now();
       const widgetId = `added-widget-${id}`;
       setAddedWidgets((prev) => [...prev, { name: e.detail.name, type: e.detail.type, id }]);
-      updateLayouts((prev) => ({
+      updateLayouts((prev: any) => ({
         ...prev,
         lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
       }));
@@ -113,17 +115,17 @@ const AgentView = () => {
     return () => window.removeEventListener('addWidget', handler);
   }, []);
 
-  const handleDuplicate = (cardTitle, cardId) => {
+  const handleDuplicate = (cardTitle: string, cardId: string) => {
     const id = Date.now();
     const widgetId = `added-widget-${id}`;
     setAddedWidgets((prev) => [...prev, { id, name: `${cardTitle} (Copy)`, type: cardId, sourceCardId: cardId }]);
-    updateLayouts((prev) => ({
+    updateLayouts((prev: any) => ({
       ...prev,
       lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
     }));
   };
 
-  const cards = {
+  const cards: Record<string, any> = {
     'agent-stats-row': (
       <Card cardId="agent-stats-row" title="My Stats" onDuplicate={handleDuplicate}>
         <CardHeader title="My Stats" />
@@ -180,13 +182,13 @@ const AgentView = () => {
     ),
   };
 
-  const widgetCards = {};
+  const widgetCards: Record<string, any> = {};
   addedWidgets.forEach((w) => {
     const widgetId = `added-widget-${w.id}`;
     widgetCards[widgetId] = (
       <Card cardId={widgetId} title={w.name} onDuplicate={handleDuplicate} onRemove={() => {
         setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
-        updateLayouts((prev) => ({ ...prev, lg: prev.lg.filter((l) => l.i !== widgetId) }));
+        updateLayouts((prev: any) => ({ ...prev, lg: prev.lg.filter((l: any) => l.i !== widgetId) }));
       }}>
         <CardHeader title={w.name} />
         <p className="text-[12px] text-[#949494]">Widget type: {w.type}</p>
@@ -197,7 +199,7 @@ const AgentView = () => {
   const allCards = { ...cards, ...widgetCards };
 
   return (
-    <DashboardGrid layouts={layouts} onLayoutChange={(_, all) => updateLayouts(all)}>
+    <DashboardGrid layouts={layouts} onLayoutChange={(_: any, all: any) => updateLayouts(all)}>
       {Object.keys(allCards).map((id) => (
         <div key={id}>{allCards[id]}</div>
       ))}
