@@ -46,11 +46,11 @@ const Sidebar = () => (
     >
       <Logo />
     </div>
-    <SidebarIcon icon={CallIcon} active />
     <SidebarIcon icon={InboxIcon} />
-    <SidebarIcon icon={CallMergeIcon} />
+    <SidebarIcon icon={CallIcon} active />
     <SidebarIcon icon={HeadphonesIcon} />
     <SidebarIcon icon={ContactsIcon} />
+    <SidebarIcon icon={CallMergeIcon} />
     <SidebarIcon icon={SpaceDashboardIcon} />
   </div>
 );

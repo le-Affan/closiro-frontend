@@ -1,13 +1,13 @@
-import BarChartIcon from '@mui/icons-material/BarChart';
-import InfoIcon from '@mui/icons-material/Info';
-import DatasetIcon from '@mui/icons-material/Dataset';
-import RingVolumeIcon from '@mui/icons-material/RingVolume';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import DatasetOutlinedIcon from '@mui/icons-material/DatasetOutlined';
+import RingVolumeOutlinedIcon from '@mui/icons-material/RingVolumeOutlined';
 
 const NAV2_ITEMS = [
-  { label: 'Live', icon: BarChartIcon },
-  { label: 'Data', icon: InfoIcon },
-  { label: 'Information', icon: DatasetIcon, active: true },
-  { label: 'Insights', icon: RingVolumeIcon },
+  { label: 'Live', icon: RingVolumeOutlinedIcon },
+  { label: 'Data', icon: DatasetOutlinedIcon },
+  { label: 'Information', icon: InfoOutlinedIcon, active: true },
+  { label: 'Insights', icon: BarChartOutlinedIcon },
 ];
 
 const SecondSidebar = () => (
