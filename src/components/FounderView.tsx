@@ -5,12 +5,14 @@ import {
 } from 'recharts';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Card, CardHeader, ConnectedCardMenu, Sparkle, PerformersTable, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
+import { Card as CardRaw, CardHeader, ConnectedCardMenu, Sparkle, PerformersTable, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { adminKpis, pipelineData, monthlyRevenueData, repPerformanceTable } from '../data/mockData';
+
+const Card: any = CardRaw;
 
 const LAYOUT_KEY = 'closira-layout-founder';
 
-const KPI_DOT_COLORS = {
+const KPI_DOT_COLORS: Record<string, string> = {
   'Total Calls': '#2883ff',
   'Connected Calls': '#42b311',
   'Missed Calls': '#f4372a',
@@ -18,7 +20,7 @@ const KPI_DOT_COLORS = {
   'Conversion Signal': '#a1e2b3',
 };
 
-const DEFAULT_LAYOUTS = {
+const DEFAULT_LAYOUTS: any = {
   lg: [
     { i: 'founder-kpi-pills', x: 0, y: 0, w: 12, h: 1 },
     { i: 'founder-annual-revenue', x: 0, y: 1, w: 6, h: 4 },
@@ -28,10 +30,10 @@ const DEFAULT_LAYOUTS = {
   ],
 };
 
-const useChartConfig = () => {
-  const { getConfig } = useContext(ChartConfigRegistryContext);
+const useChartConfig = (): any => {
+  const { getConfig } = useContext(ChartConfigRegistryContext) as any;
   const cardId = useContext(CardIdContext);
-  return getConfig(cardId, CHART_DEFAULTS[cardId]);
+  return getConfig(cardId, (CHART_DEFAULTS as any)[cardId as any]);
 };
 
 const AnnualRevenueTarget = () => {
@@ -145,13 +147,13 @@ const MonthlyRevenueTarget = () => {
                 tickFormatter={(v) => v === 0 ? '0' : `${v / 1000}K`} />
               <YAxis type="category" dataKey="name" hide />
               <Bar dataKey="a" stackId="r" fill={colors.seg1} barSize={32} radius={[4, 0, 0, 4]}>
-                {showLabels && <LabelList dataKey="a" position="center" formatter={(v) => `${v / 1000}K`} fill="#ffffff" fontSize={10} />}
+                {showLabels && <LabelList dataKey="a" position="center" formatter={(v: any) => `${v / 1000}K`} fill="#ffffff" fontSize={10} />}
               </Bar>
               <Bar dataKey="b" stackId="r" fill={colors.seg2} barSize={32}>
-                {showLabels && <LabelList dataKey="b" position="center" formatter={(v) => `${v / 1000}K`} fill="#ffffff" fontSize={10} />}
+                {showLabels && <LabelList dataKey="b" position="center" formatter={(v: any) => `${v / 1000}K`} fill="#ffffff" fontSize={10} />}
               </Bar>
               <Bar dataKey="c" stackId="r" fill={colors.seg3} barSize={32} radius={[0, 4, 4, 0]}>
-                {showLabels && <LabelList dataKey="c" position="center" formatter={(v) => `${v / 1000}K`} fill="#585858" fontSize={10} />}
+                {showLabels && <LabelList dataKey="c" position="center" formatter={(v: any) => `${v / 1000}K`} fill="#585858" fontSize={10} />}
               </Bar>
             </BarChart>
           )}
@@ -210,7 +212,7 @@ const PipelineChart = () => {
 };
 
 const FounderView = () => {
-  const { getConfig } = useContext(ChartConfigRegistryContext);
+  const { getConfig } = useContext(ChartConfigRegistryContext) as any;
   const kpiColor = getConfig('founder-kpi-pills', {}).colors?.primary;
   const performersColor = getConfig('founder-top-performers', {}).colors?.primary;
 
@@ -229,7 +231,7 @@ const FounderView = () => {
     rows: pipelineData.map((d) => [d.name, d.value]),
   };
 
-  const [layouts, setLayouts] = useState(() => {
+  const [layouts, setLayouts] = useState<any>(() => {
     try {
       const saved = localStorage.getItem(LAYOUT_KEY);
       if (saved) return JSON.parse(saved);
@@ -239,22 +241,22 @@ const FounderView = () => {
     return DEFAULT_LAYOUTS;
   });
 
-  const updateLayouts = (update) => {
-    setLayouts((prev) => {
+  const updateLayouts = (update: any) => {
+    setLayouts((prev: any) => {
       const next = typeof update === 'function' ? update(prev) : update;
       localStorage.setItem(LAYOUT_KEY, JSON.stringify(next));
       return next;
     });
   };
 
-  const [addedWidgets, setAddedWidgets] = useState([]);
+  const [addedWidgets, setAddedWidgets] = useState<any[]>([]);
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: any) => {
       const id = Date.now();
       const widgetId = `added-widget-${id}`;
       setAddedWidgets((prev) => [...prev, { name: e.detail.name, type: e.detail.type, id }]);
-      updateLayouts((prev) => ({
+      updateLayouts((prev: any) => ({
         ...prev,
         lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
       }));
@@ -263,17 +265,17 @@ const FounderView = () => {
     return () => window.removeEventListener('addWidget', handler);
   }, []);
 
-  const handleDuplicate = (cardTitle, cardId) => {
+  const handleDuplicate = (cardTitle: string, cardId: string) => {
     const id = Date.now();
     const widgetId = `added-widget-${id}`;
     setAddedWidgets((prev) => [...prev, { id, name: `${cardTitle} (Copy)`, type: cardId, sourceCardId: cardId }]);
-    updateLayouts((prev) => ({
+    updateLayouts((prev: any) => ({
       ...prev,
       lg: [...prev.lg, { i: widgetId, x: 0, y: Infinity, w: 6, h: 3, minW: 3, minH: 2 }],
     }));
   };
 
-  const cards = {
+  const cards: Record<string, any> = {
     'founder-kpi-pills': (
       <Card cardId="founder-kpi-pills">
         <div style={{ display: 'flex', flexDirection: 'row', gap: 20, width: '100%' }}>
@@ -287,7 +289,7 @@ const FounderView = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
                 <div className="flex items-center gap-2">
-                  <div style={{ width: 10, height: 10, borderRadius: 100, background: KPI_DOT_COLORS[kpi.label] || kpi.color }} />
+                  <div style={{ width: 10, height: 10, borderRadius: 100, background: KPI_DOT_COLORS[kpi.label] || (kpi as any).color }} />
                   <span className="stat-label" style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 400, color: '#737373' }}>{kpi.label}</span>
                 </div>
                 <ArrowDownwardIcon sx={{ fontSize: 20 }} style={{ color: '#3ca30f' }} />
@@ -358,13 +360,13 @@ const FounderView = () => {
     ),
   };
 
-  const widgetCards = {};
+  const widgetCards: Record<string, any> = {};
   addedWidgets.forEach((w) => {
     const widgetId = `added-widget-${w.id}`;
     widgetCards[widgetId] = (
       <Card cardId={widgetId} title={w.name} onDuplicate={handleDuplicate} onRemove={() => {
         setAddedWidgets((prev) => prev.filter((x) => x.id !== w.id));
-        updateLayouts((prev) => ({ ...prev, lg: prev.lg.filter((l) => l.i !== widgetId) }));
+        updateLayouts((prev: any) => ({ ...prev, lg: prev.lg.filter((l: any) => l.i !== widgetId) }));
       }}>
         <CardHeader title={w.name} />
         <p className="text-[12px] text-[#949494]">Widget type: {w.type}</p>
@@ -375,7 +377,7 @@ const FounderView = () => {
   const allCards = { ...cards, ...widgetCards };
 
   return (
-    <DashboardGrid layouts={layouts} onLayoutChange={(_, all) => updateLayouts(all)}>
+    <DashboardGrid layouts={layouts} onLayoutChange={(_: any, all: any) => updateLayouts(all)}>
       {Object.keys(allCards).map((id) => (
         <div key={id}>{allCards[id]}</div>
       ))}
