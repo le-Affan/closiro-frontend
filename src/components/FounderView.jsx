@@ -3,10 +3,19 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
   XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList,
 } from 'recharts';
-import { Card, CardHeader, ConnectedCardMenu, DownArrow, Sparkle, PerformersTable, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { Card, CardHeader, ConnectedCardMenu, Sparkle, PerformersTable, PipelineFunnel, DashboardGrid, ChartConfigRegistryContext, CardIdContext, CHART_DEFAULTS } from './SharedUI';
 import { adminKpis, pipelineData, monthlyRevenueData, repPerformanceTable } from '../data/mockData';
 
 const LAYOUT_KEY = 'closira-layout-founder';
+
+const KPI_DOT_COLORS = {
+  'Total Calls': '#2883ff',
+  'Connected Calls': '#42b311',
+  'Missed Calls': '#f4372a',
+  'Follow-ups': '#f1a013',
+  'Conversion Signal': '#a1e2b3',
+};
 
 const DEFAULT_LAYOUTS = {
   lg: [
@@ -266,14 +275,23 @@ const FounderView = () => {
   const cards = {
     'founder-kpi-pills': (
       <Card cardId="founder-kpi-pills">
-        <div className="flex items-center gap-6">
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 20, width: '100%' }}>
           {adminKpis.map((kpi) => (
-            <div key={kpi.label} className="flex items-center gap-2">
-              <DownArrow color={kpi.color} />
-              <div>
-                <div className="text-[11px] text-[#949494] stat-label">{kpi.label}</div>
-                <div className="text-[15px] font-semibold text-[#585858] stat-number" style={kpiColor ? { color: kpiColor } : undefined}>{kpi.value}</div>
+            <div
+              key={kpi.label}
+              style={{
+                display: 'flex', padding: 16, flexDirection: 'column', alignItems: 'flex-start', gap: 12,
+                flex: '1 0 0', borderRadius: 12, border: '1px solid #e0e0e0', background: '#ffffff',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
+                <div className="flex items-center gap-2">
+                  <div style={{ width: 10, height: 10, borderRadius: 100, background: KPI_DOT_COLORS[kpi.label] || kpi.color }} />
+                  <span className="stat-label" style={{ fontFamily: 'Inter', fontSize: 14, fontWeight: 400, color: '#737373' }}>{kpi.label}</span>
+                </div>
+                <ArrowDownwardIcon sx={{ fontSize: 20 }} style={{ color: '#3ca30f' }} />
               </div>
+              <div className="stat-number" style={{ fontFamily: 'Inter', fontSize: 24, fontWeight: 600, color: kpiColor || '#000000' }}>{kpi.value}</div>
             </div>
           ))}
         </div>
