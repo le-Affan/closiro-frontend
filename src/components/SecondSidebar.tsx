@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const NAV2_ITEMS: any[] = [
   { label: 'Live', icon: RingVolumeOutlinedIcon, to: '/live' },
-  { label: 'Data', icon: DatasetOutlinedIcon, to: '/' },
+  { label: 'Data', icon: DatasetOutlinedIcon, to: '/data' },
   { label: 'Information', icon: InfoOutlinedIcon, to: '/' },
   { label: 'Insights', icon: BarChartOutlinedIcon, to: '/' },
 ];

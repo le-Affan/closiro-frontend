@@ -5,7 +5,7 @@ interface ProfileSwitcherProps {
 
 // ---------- profile switcher (self-contained, delete this block to remove) ----------
 const ProfileSwitcher = ({ selectedProfile, setSelectedProfile }: ProfileSwitcherProps) => (
-  <div className="fixed top-3 right-3" style={{ zIndex: 9999 }}>
+  <div className="fixed top-4 right-[160px]" style={{ zIndex: 9999 }}>
     <select
       value={selectedProfile}
       onChange={(e) => setSelectedProfile(e.target.value)}

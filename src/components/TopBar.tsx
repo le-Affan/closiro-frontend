@@ -1,45 +1,63 @@
-const TopBar = () => (
-  <div className="h-[54px] flex items-center justify-between px-6 border-b border-[#f1f1f1] shrink-0">
-    <div className="flex items-center gap-3 text-[13px] text-[#737373]">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M15 18l-6-6 6-6" stroke="#bebebe" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <span>Calls</span>
-      <span className="text-[#bebebe]">/</span>
-      <span className="text-[#585858] font-medium">Information</span>
+import React from 'react';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import AutoFixNormalIcon from '@mui/icons-material/AutoFixNormal';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+
+const TopBar = () => {
+  return (
+    <div className="h-[64px] border-b border-neutral-200 bg-white flex items-center justify-between px-6 shrink-0">
+      
+      {/* Left side: Breadcrumbs / Sidebar toggle */}
+      <div className="flex items-center">
+        <button className="w-8 h-8 flex items-center justify-center rounded-md text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors mr-2 shrink-0">
+          <FirstPageIcon sx={{ width: 20, height: 20 }} />
+        </button>
+        <span className="font-semibold text-[15px] text-neutral-600">Calls</span>
+        <ChevronRightIcon sx={{ width: 16, height: 16 }} className="mx-3 text-neutral-400" />
+        <span className="font-semibold text-[15px] text-neutral-900">Live</span>
+      </div>
+
+      {/* Center: Search and Quick Actions */}
+      <div className="flex items-center space-x-3 flex-1 justify-center max-w-2xl px-8">
+        <div className="relative w-full max-w-[440px]">
+          <SearchIcon sx={{ width: 20, height: 20 }} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+          <input 
+            type="text" 
+            placeholder="Search" 
+            className="w-full h-[34px] pl-9 pr-4 rounded-full border border-neutral-300 bg-white text-[14px] text-neutral-900 focus:outline-none focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400 placeholder:text-neutral-400"
+          />
+        </div>
+        
+        <div className="flex items-center space-x-2 pl-2">
+          <button className="w-8 h-8 flex items-center justify-center rounded-full border border-neutral-200 text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors">
+            <AddIcon sx={{ width: 20, height: 20 }} />
+          </button>
+          <button className="w-8 h-8 flex items-center justify-center rounded-full border border-neutral-200 text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors">
+            <AutoFixNormalIcon sx={{ width: 20, height: 20 }} />
+          </button>
+        </div>
+      </div>
+
+      {/* Right side: Global Actions & Profile */}
+      <div className="flex items-center space-x-2.5">
+        <button className="w-8 h-8 flex items-center justify-center rounded-full border border-neutral-200 text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors">
+          <QuestionMarkIcon sx={{ width: 20, height: 20 }} />
+        </button>
+        <button className="w-8 h-8 flex items-center justify-center rounded-full border border-neutral-200 text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors">
+          <NotificationsOutlinedIcon sx={{ width: 20, height: 20 }} />
+        </button>
+        <button className="w-8 h-8 flex items-center justify-center rounded-full border border-neutral-200 text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors overflow-hidden">
+          <AccountCircleOutlinedIcon sx={{ width: 20, height: 20 }} />
+        </button>
+      </div>
+
     </div>
-    <div className="flex items-center gap-2 bg-[#fafafa] border border-[#eaeaea] rounded-full px-4 py-1.5 w-80">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="11" cy="11" r="7" stroke="#bebebe" strokeWidth="2.5" />
-        <path d="M21 21l-4-4" stroke="#bebebe" strokeWidth="2.5" strokeLinecap="round" />
-      </svg>
-      <span className="text-[12px] text-[#bebebe]">Search</span>
-    </div>
-    <div className="flex items-center gap-3">
-      <button className="text-[12px] font-medium text-[#585858] border border-[#e0e0e0] rounded-sm px-4 py-2 hover:bg-[#ffffff] transition-colors duration-150">
-        Export
-      </button>
-      <button className="p-1.5 rounded-full hover:bg-[#ffffff] transition-colors duration-150">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#bebebe" strokeWidth="2.5" />
-          <path d="M12 8v4M12 16h.01" stroke="#bebebe" strokeWidth="2.5" strokeLinecap="round" />
-        </svg>
-      </button>
-      <button className="p-1.5 rounded-full hover:bg-[#ffffff] transition-colors duration-150">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M18 8a6 6 0 00-12 0c0 4-1.5 5.5-1.5 5.5h15S18 12 18 8z" stroke="#bebebe" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M10.5 17a1.5 1.5 0 003 0" stroke="#bebebe" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-      <button className="p-1.5 rounded-full hover:bg-[#ffffff] transition-colors duration-150">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#bebebe" strokeWidth="2.5" />
-          <circle cx="12" cy="10" r="3" stroke="#bebebe" strokeWidth="2.5" />
-          <path d="M6 19c1-2.5 3.5-4 6-4s5 1.5 6 4" stroke="#bebebe" strokeWidth="2.5" strokeLinecap="round" />
-        </svg>
-      </button>
-    </div>
-  </div>
-);
+  );
+};
 
 export default TopBar;

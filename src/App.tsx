@@ -8,6 +8,7 @@ import 'react-resizable/css/styles.css';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const LivePage = lazy(() => import('./pages/LivePage'));
+const DataPage = lazy(() => import('./pages/DataPage'));
 
 function App() {
   return (
@@ -21,11 +22,12 @@ function App() {
           <TopBar />
           <div className="flex flex-1 overflow-hidden">
             <SecondSidebar />
-            <main className="flex-1 overflow-auto bg-white">
+            <main className="flex flex-col flex-1 overflow-hidden bg-white">
               <Suspense fallback={<div className="flex-1 flex items-center justify-center">Loading...</div>}>
                 <Routes>
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/live" element={<LivePage />} />
+                  <Route path="/data" element={<DataPage />} />
                 </Routes>
               </Suspense>
             </main>
